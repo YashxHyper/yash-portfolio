@@ -478,6 +478,7 @@ section .wrap::before{content:"";position:absolute;inset:-30px -4vw auto;height:
 #charCompanion .char-fallback{display:none;width:78%;height:78%;margin:8% auto 0}
 #charCompanion.nogl canvas{display:none}
 #charCompanion.nogl .char-fallback{display:block;animation:charBob 2.4s ease-in-out infinite}
+#charCompanion.nogl .char-fallback{pointer-events:auto;cursor:pointer}
 @keyframes charBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
 .char-tag{position:absolute;left:50%;top:-9px;bottom:auto;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.12em;color:var(--lime);background:rgba(8,8,16,.62);border:1px solid rgba(198,255,58,.4);padding:3px 9px;border-radius:99px;white-space:nowrap;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:opacity .35s;pointer-events:none}
 @media(max-width:760px){#charCompanion{width:84px;height:107px}.char-tag{font-size:.44rem;top:-7px;padding:2px 7px}}
@@ -585,10 +586,14 @@ section[id]{scroll-margin-top:92px}
      whenever the scroll observer/transition stalled under load: on touch
      devices content is simply always visible. The gentle float loops stay. */
   .reveal{opacity:1!important;transform:none!important;transition:none}
-  /* The travelling character must never swallow a tap on a phone. */
-  #charCompanion{pointer-events:none!important}
+  /* The travelling character must never swallow a tap on a phone: it
+     starts with pointer-events:none and the script re-enables taps only
+     while its rendered box sits clear of every button/tile (the overlap
+     check in the character loop). No !important override here — one used
+     to sit on this rule and also killed the script's toggle and the tap
+     bubble on touch devices, which is why the character felt dead on
+     phones. The tag stays hidden on touch; the bubble carries the tap. */
   .char-tag{display:none}
-  #charBubble{display:none!important}
   .card:hover,.tool:hover,.c-link:hover{transform:none}
   /* Phones: backdrop blur over live WebGL is the main scroll cost and the
      thing that left glass cards painting blank under load on Android.
@@ -1142,7 +1147,7 @@ section[id]{scroll-margin-top:92px}
     <div class="contact-grid">
       <div class="reveal">
         <a class="c-link" href="mailto:yash36796@gmail.com"><span class="cic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><span><small>Email</small><b>yash36796@gmail.com</b></span></a>
-        <a class="c-link" href="https://www.instagram.com/yash_editz69" target="_blank" rel="noopener"><span class="cic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg></span><span><small>Instagram</small><b>@yash_editz69</b></span></a>
+        <a class="c-link" href="https://www.instagram.com/yasheditz_69?exln=YW5naWMyazFkdHNm" target="_blank" rel="noopener"><span class="cic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg></span><span><small>Instagram</small><b>@yasheditz_69</b></span></a>
         <a class="c-link" href="https://www.linkedin.com/in/yash-kumar-004071392" target="_blank" rel="noopener"><span class="cic"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="fill:var(--lime)"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg></span><span><small>LinkedIn</small><b>linkedin.com/in/yash-kumar-004071392</b></span></a>
         <a class="c-link" href="https://yash69.my.canva.site/hyper" target="_blank" rel="noopener"><span class="cic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg></span><span><small>Canva Portfolio — HYPER</small><b>yash69.my.canva.site/hyper</b></span></a>
         <div class="card" style="margin-top:6px"><h3>Working remotely</h3><p>Working remotely with creators and brands everywhere. Languages: All Languages.</p></div>
@@ -1173,7 +1178,7 @@ section[id]{scroll-margin-top:92px}
         <p>Professional Video Editor · Thumbnails · Motion Graphics · Reels Expert.</p>
       </div>
       <div style="text-align:right">
-        <p><a href="mailto:yash36796@gmail.com">yash36796@gmail.com</a> · <a href="https://www.instagram.com/yash_editz69" target="_blank" rel="noopener">@yash_editz69</a> · <a href="https://www.linkedin.com/in/yash-kumar-004071392" target="_blank" rel="noopener">LinkedIn</a></p>
+        <p><a href="mailto:yash36796@gmail.com">yash36796@gmail.com</a> · <a href="https://www.instagram.com/yasheditz_69?exln=YW5naWMyazFkdHNm" target="_blank" rel="noopener">@yasheditz_69</a> · <a href="https://www.linkedin.com/in/yash-kumar-004071392" target="_blank" rel="noopener">LinkedIn</a></p>
         <p class="credit">© 2026 Yash Kumar · HYPER — We Grow Together</p>
       </div>
     </div>
@@ -1828,7 +1833,16 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
     var hfEl=document.getElementById('hireForm'); if(hfEl) hfEl.addEventListener('submit',function(){ formQueued=true; showBubble('Message ready! Email app me Send dabao',3600); });
     document.addEventListener('orbitpick',function(){ orbitQueued=true; wake(); });
     var r=mkRenderer(cv);
-    if(!r){ wrap.classList.add('nogl'); return; }
+    if(!r){ wrap.classList.add('nogl');
+      /* No WebGL context (common on phones under memory pressure): the
+         SVG fallback must still sit visible in the bottom corner and
+         stay tappable — without this dock the character froze at the
+         top-left of the page, which is the "not working on mobile"
+         report. The tap/bubble listeners above were attached before
+         this return, and the fallback bobs via CSS (charBob). */
+      (function dockFallback(){ var w=wrap.clientWidth,h=wrap.clientHeight; wrap.style.transform='translate('+(innerWidth-6-w*0.94).toFixed(1)+'px,'+(innerHeight-h-8).toFixed(1)+'px) scale(0.88)'; })();
+      addEventListener('resize',function(){ var w=wrap.clientWidth,h=wrap.clientHeight; wrap.style.transform='translate('+(innerWidth-6-w*0.94).toFixed(1)+'px,'+(innerHeight-h-8).toFixed(1)+'px) scale(0.88)'; });
+      return; }
     var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(40,wrap.clientWidth/Math.max(wrap.clientHeight,1),0.1,100); cam.position.set(0,0.5,8.2); cam.lookAt(0,0.1,0);
     lights(scene);
     var SEG=SMALL?16:24;
@@ -1987,15 +2001,14 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
       var chosen=null;
       for(var ci=0;ci<cands.length;ci++){ if(hitArea(boxFor(cands[ci].x,cands[ci].y,cands[ci].s))<=0){ chosen=cands[ci]; break; } }
       if(!chosen){ chosen=cands[0]; var bestA=hitArea(boxFor(chosen.x,chosen.y,chosen.s)); for(var cj=1;cj<cands.length;cj++){ var ca2=hitArea(boxFor(cands[cj].x,cands[cj].y,cands[cj].s)); if(ca2<bestA){ bestA=ca2; chosen=cands[cj]; } } }
-      /* Phones: there is no gutter beside a full-width card column, so the
-         travelling solver can only ever park the character ON text. On
-         small screens pin it as a small peek in the bottom-right corner
-         instead — clear of the centre column, taps still pass through. */
-      /* The companion scales about its bottom-centre (transform-origin
-         50% 100%), so the rendered box keeps the element's bottom edge
-         and centres on its midpoint: solve x/y from the RENDERED box,
-         or the base disc and legs get clipped by the viewport edge. */
-      if(innerWidth<=760){ chosen={k:'corner',x:innerWidth-CW*(1+0.66)/2-6,y:vh-CH-6,s:0.66}; prefCand='corner'; }
+      /* Phones: there is no gutter beside a full-width card column, so
+         the character docks along the bottom edge instead — but at a
+         readable size, gliding to the left or right edge with the
+         section (L/R anchor) so it visibly travels and changes pose as
+         the page scrolls, instead of sitting frozen as a tiny sliver in
+         one corner. Taps still pass through whenever it overlaps a
+         button or tile (the overlap check below). */
+      if(innerWidth<=760){ var mScale=0.88, mDockL=6-CW*(1-mScale)/2, mDockR=innerWidth-6-CW*(1+mScale)/2; chosen={k:'corner',x:(cur[1]==='L'?mDockL:mDockR),y:vh-CH-8,s:mScale}; prefCand='corner'; }
       /* On-screen safety net: a dock pushed below the fold (e.g. by downY on a
          phone) made the character invisible. Never let it leave the viewport. */
       chosen.y=Math.min(chosen.y, vh-CH*chosen.s-6);
@@ -2297,10 +2310,11 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
 <script>
 /* Touch phones only: if the 3D library itself failed to load, the whole
    extra-scenes block above returns early and no fallback class is ever
-   set — the tool-orbit and contact-wave boxes would sit empty. In that
-   one case, mark both boxes so the existing spinning-disc fallback
-   (.mini3d.nogl) shows instead of an empty box. When 3D loads normally
-   this does nothing, and desktop behaviour is unchanged. */
+   set — the tool-orbit and contact-wave boxes would sit empty, and the
+   travelling character would freeze at the top-left corner. In that one
+   case, mark the boxes (and dock the character, with its tap greeting)
+   so the existing fallbacks show instead of empty space. When 3D loads
+   normally this does nothing, and desktop behaviour is unchanged. */
 (function(){
   if(!window.matchMedia||!matchMedia('(pointer:coarse)').matches) return;
   function markDead(){
@@ -2309,6 +2323,11 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
       var cv=document.getElementById(id); if(!cv) return;
       var box=cv.closest('.mini3d'); if(box) box.classList.add('nogl');
     });
+    var wrap=document.getElementById('charCompanion');
+    if(wrap){ wrap.classList.add('nogl'); wrap.style.left='auto'; wrap.style.right='8px'; wrap.style.top='auto'; wrap.style.bottom='8px'; wrap.style.transform='none';
+      var bubble=document.getElementById('charBubble');
+      wrap.addEventListener('click',function(){ if(!bubble) return; bubble.textContent='Hi! Main Yash ka edit buddy hoon'; bubble.classList.add('show'); setTimeout(function(){ bubble.classList.remove('show'); },3500); });
+    }
   }
   if(document.readyState==='complete') setTimeout(markDead,1500);
   else addEventListener('load',function(){ setTimeout(markDead,1500); });
