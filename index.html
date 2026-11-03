@@ -725,11 +725,11 @@ section[id]{scroll-margin-top:92px}
 
       <div class="stage" id="stage">
         <div class="css-fallback" aria-hidden="true"><div class="disc"></div></div>
-        <canvas id="gl" aria-label="Interactive 3D scene of a video editor world — glowing play button, film frames and timeline orbiting in space"></canvas>
+        <canvas id="gl" aria-label="Interactive 3D scene of a video editor world — glowing play button, gyroscope rings, floating HYPER letter cubes, film frames and timeline orbiting in space. Tap the stage for a HYPER burst."></canvas>
         <div class="glass-ring" aria-hidden="true"></div><div class="glass-blob gb1" aria-hidden="true"></div><div class="glass-blob gb2" aria-hidden="true"></div><span class="glass-chip" aria-hidden="true">LIQUID GLASS · LIVE 3D</span>
         <span class="hud tl"><span class="rec"></span>REC · 3D_SCENE_01</span>
         <span class="hud tr">LIVE RENDER</span>
-        <span class="hud bl">Move mouse — scene reacts</span>
+        <span class="hud bl">Click stage — HYPER BURST</span>
         <span class="hud br">Three.js · 60 FPS</span>
       </div>
     </div>
@@ -1283,7 +1283,7 @@ setTimeout(function(){ document.getElementById('loader').classList.add('done'); 
   var svcHud = document.querySelector('.svc-3d .hud.tr');
   if(svcHud) svcHud.textContent = 'TAP = TURBO';
   var stageHud = document.querySelector('#stage .hud.bl');
-  if(stageHud) stageHud.textContent = 'Tilt phone — scene reacts';
+  if(stageHud) stageHud.textContent = 'Tap stage — HYPER BURST';
 })();
 
 /* ============ progress + reveal ============ */
@@ -1625,6 +1625,76 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
     new THREE.MeshStandardMaterial({color: CYAN, emissive: CYAN, emissiveIntensity: 0.45, roughness: 0.4}));
   ringB.rotation.x = Math.PI/1.7; ringB.rotation.y = 0.5; world.add(ringB);
 
+  /* ---- TAGDA ADDITION: gyroscope cage + floating HYPER letter cubes ----
+     All inside this one hero renderer (no new WebGL context, so phones
+     pay almost nothing extra): three counter-rotating emissive rings cage
+     the play disc, five glowing letter cubes orbit it in an ellipse, and
+     a tap/click on the stage fires a HYPER BURST — shockwave rings, a
+     light flash and a camera punch-in. Loops forever, like everything
+     else on this page. */
+  var gyroSeg = mobile ? 48 : 80;
+  var gyro = new THREE.Group(); world.add(gyro);
+  var gyroRings = [];
+  [[2.85, LIME, 0.045], [3.3, VIOLET, 0.04], [3.75, CYAN, 0.035]].forEach(function(cfg, gi){
+    var ring = new THREE.Mesh(
+      new THREE.TorusGeometry(cfg[0], cfg[2], 10, gyroSeg),
+      new THREE.MeshStandardMaterial({color: cfg[1], emissive: cfg[1], emissiveIntensity: 0.6, roughness: 0.3, metalness: 0.4})
+    );
+    ring.rotation.x = [Math.PI/2.4, Math.PI/1.7, Math.PI/3.2][gi];
+    ring.rotation.y = [0, 0.5, -0.6][gi];
+    gyro.add(ring); gyroRings.push(ring);
+  });
+  var gyroCore = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.42),
+    new THREE.MeshStandardMaterial({color: 0xfebc2e, emissive: 0xfebc2e, emissiveIntensity: 0.7, roughness: 0.3, metalness: 0.4})
+  );
+  gyroCore.position.set(0, 0, 2.9); gyro.add(gyroCore);
+
+  function letterTex(letter, hexCss){
+    var c = document.createElement('canvas'); c.width = c.height = 128;
+    var g = c.getContext('2d');
+    g.fillStyle = '#10101c'; g.fillRect(0, 0, 128, 128);
+    g.strokeStyle = hexCss; g.lineWidth = 8; g.strokeRect(7, 7, 114, 114);
+    g.fillStyle = hexCss; g.font = '900 74px Arial, sans-serif';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.shadowColor = hexCss; g.shadowBlur = 18; g.fillText(letter, 64, 68);
+    return new THREE.CanvasTexture(c);
+  }
+  var hyperCubes = [];
+  [['H', LIME, '#c6ff3a'], ['Y', VIOLET, '#8b5cf6'], ['P', CYAN, '#3ae0ff'], ['E', 0xff4d7e, '#ff4d7e'], ['R', 0xfebc2e, '#febc2e']].forEach(function(cfg, i){
+    var tex = letterTex(cfg[0], cfg[2]);
+    var cube = new THREE.Mesh(
+      new THREE.BoxGeometry(0.74, 0.74, 0.74),
+      new THREE.MeshStandardMaterial({map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.45, roughness: 0.35, metalness: 0.3})
+    );
+    world.add(cube);
+    hyperCubes.push({m: cube, ph: i / 5 * Math.PI * 2, spin: 0.6 + i * 0.12, col: cfg[1]});
+  });
+
+  /* shockwave rings for the burst (hidden until fired) */
+  var shocks = [];
+  for(var si = 0; si < 3; si++){
+    var sh = new THREE.Mesh(
+      new THREE.RingGeometry(2.25, 2.42, 64),
+      new THREE.MeshBasicMaterial({color: si === 1 ? VIOLET : LIME, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false})
+    );
+    sh.position.z = 1.1; sh.visible = false; world.add(sh); shocks.push(sh);
+  }
+  var burstLight = new THREE.PointLight(0xc6ff3a, 0, 26); burstLight.position.set(0, 0, 3.5); scene.add(burstLight);
+  var burst = 0, prevT = 0, hudTimer = null;
+  var hudTr = stage.querySelector('.hud.tr');
+  function fireBurst(){
+    burst = 1;
+    if(hudTr){
+      hudTr.textContent = '⚡ HYPER BURST';
+      if(hudTimer) clearTimeout(hudTimer);
+      hudTimer = setTimeout(function(){ hudTr.textContent = 'LIVE RENDER'; }, 1300);
+    }
+  }
+  /* pointerdown (not click): instant on desktop, and a plain tap on a
+     phone — no preventDefault, so scrolling is never blocked. */
+  stage.addEventListener('pointerdown', fireBurst);
+
   /* film-strip frames: outlined boxes floating on both sides */
   var frames = [];
   function makeFrame(x, y, z, c, s){
@@ -1718,22 +1788,51 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
     requestAnimationFrame(animate);
     if(!heroVis) return;
     var t = clock.getElapsedTime();
+    var dt = Math.min(Math.max(t - prevT, 0), 0.05); prevT = t;
+    burst = Math.max(0, burst - dt * 0.65);
     mx2 += (tx - mx2) * 0.045; my2 += (ty - my2) * 0.045;
     world.rotation.y = t * 0.14 + mx2 * 0.55;
     world.rotation.x = Math.sin(t * 0.22) * 0.05 + my2 * 0.32;
     heroG.position.y = Math.sin(t * 0.9) * 0.14;
     heroG.rotation.z = Math.sin(t * 0.5) * 0.04;
-    tri.material.emissiveIntensity = 0.3 + Math.sin(t * 2.4) * 0.16;
+    heroG.scale.setScalar(1 + burst * 0.13 + Math.sin(t * 1.8) * 0.015);
+    tri.material.emissiveIntensity = 0.3 + Math.sin(t * 2.4) * 0.16 + burst * 0.9;
     ringA.rotation.z = t * 0.25; ringB.rotation.z = -t * 0.18;
-    frames.forEach(function(f){ f.g.position.y = f.y + Math.sin(t * f.sp + f.ph) * 0.22; f.g.rotation.y += 0.0022; });
+    /* gyroscope cage: each ring tumbles on its own axis, counter-rotating */
+    gyroRings[0].rotation.x = Math.PI/2.4 + t * 0.24; gyroRings[0].rotation.y = t * 0.19;
+    gyroRings[1].rotation.z = -t * 0.3; gyroRings[1].rotation.x = Math.PI/1.7 + Math.sin(t * 0.4) * 0.12;
+    gyroRings[2].rotation.y = Math.PI/3.2 - t * 0.21; gyroRings[2].rotation.z = t * 0.16;
+    gyro.rotation.z = Math.sin(t * 0.3) * 0.08;
+    gyroCore.rotation.x = t * 1.4; gyroCore.rotation.y = t * 1.1;
+    gyroCore.position.set(Math.cos(t * 0.9) * 2.9, Math.sin(t * 0.9) * 2.1, 2.9 - Math.abs(Math.sin(t * 0.9)) * 1.4);
+    /* HYPER letter cubes: elliptical orbit around the disc, spinning */
+    hyperCubes.forEach(function(hc){
+      var a = t * 0.42 + hc.ph;
+      var rx = 3.95 + burst * 1.15, ry = 2.55 + burst * 0.7;
+      var depth = (Math.sin(a) + 1) / 2;
+      hc.m.position.set(Math.cos(a) * rx, Math.sin(a) * ry + 0.15, 0.9 + Math.sin(a) * 1.0);
+      hc.m.rotation.x = t * hc.spin; hc.m.rotation.y = t * (hc.spin + 0.35);
+      hc.m.scale.setScalar(0.85 + depth * 0.35 + burst * 0.22);
+    });
+    /* burst shockwaves expand and fade; burst light flashes and dies */
+    shocks.forEach(function(sh, k){
+      if(burst <= 0){ sh.visible = false; return; }
+      var ph = Math.min(1, (1 - burst) * 1.6 + k * 0.22);
+      sh.visible = ph < 1;
+      sh.scale.setScalar(1 + ph * 2.1);
+      sh.material.opacity = (1 - ph) * 0.55;
+    });
+    burstLight.intensity = burst * 90;
+    points.material.size = 0.05 + burst * 0.05;
+    frames.forEach(function(f){ f.g.position.y = f.y + Math.sin(t * f.sp + f.ph) * 0.22; f.g.rotation.y += 0.0022 + burst * 0.012; });
     head.position.x = -3.7 + ((t * 0.85) % 7.4);
     orbiters.forEach(function(o){
       var a = t * o.sp + o.ph;
       o.m.position.set(Math.cos(a) * o.r, o.y + Math.sin(t * 0.8 + o.ph) * 0.35, Math.sin(a) * o.r - 1.2);
       o.m.rotation.x = t * 0.7; o.m.rotation.y = t * 0.55;
     });
-    points.rotation.y = t * 0.018;
-    cam.position.x = mx2 * 0.55; cam.position.y = 0.6 - my2 * 0.4;
+    points.rotation.y = t * 0.018 + burst * 0.35;
+    cam.position.x = mx2 * 0.55; cam.position.y = 0.6 - my2 * 0.4; cam.position.z = 11.5 - burst * 0.7;
     cam.lookAt(0, -0.2, 0);
     renderer.render(scene, cam);
   })();
