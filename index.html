@@ -1,0 +1,2145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
+<title>Yash Kumar — Video Editor | 3D Portfolio</title>
+<meta name="description" content="Yash Kumar (HYPER) — Professional Video Editor, Thumbnails, Motion Graphics & Reels Expert. 3D interactive portfolio. All videos in 4K Ultra HD, edits from ₹200.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="assets/three.min.js"></script>
+<style>
+:root{
+  --bg:#07070d; --bg2:#0c0c15; --panel:#12121e; --panel2:#171728;
+  --line:rgba(255,255,255,.09); --text:#f4f4ec; --muted:#a9a9ba; --muted2:#7d7d92;
+  --lime:#c6ff3a; --lime-dim:rgba(198,255,58,.14); --violet:#8b5cf6; --violet-dim:rgba(139,92,246,.16);
+  --cyan:#3ae0ff; --pink:#ff4d7e;
+  --r-lg:22px; --r-md:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6}
+::selection{background:var(--lime);color:#0a0a0a}
+img,video{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3,.disp{font-family:'Unbounded',system-ui,sans-serif;line-height:1.05;margin:0;font-weight:700}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.wrap{width:min(1200px,92vw);margin:0 auto;position:relative;z-index:2}
+
+/* scroll progress */
+#progress{position:fixed;top:0;left:0;height:3px;width:0%;z-index:400;background:linear-gradient(90deg,var(--lime),var(--violet),var(--cyan),var(--lime));background-size:220% 100%;animation:gradShift 3s linear infinite}
+@keyframes gradShift{to{background-position:220% 0}}
+
+/* custom cursor */
+#curDot,#curRing{position:fixed;top:0;left:0;pointer-events:none;z-index:390;border-radius:50%;transform:translate(-50%,-50%);display:none}
+#curDot{width:8px;height:8px;background:var(--lime)}
+#curRing{width:38px;height:38px;border:1.5px solid rgba(198,255,58,.65);transition:width .18s,height .18s,border-color .18s,background .18s}
+#curRing.big{width:64px;height:64px;border-color:var(--violet);background:rgba(139,92,246,.12)}
+@media(pointer:fine){#curDot,#curRing{display:block}}
+
+/* loader */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s,visibility .5s}
+#loader.done{opacity:0;visibility:hidden}
+#loader .lname{font-family:'Unbounded';font-weight:900;font-size:clamp(2rem,8vw,3.6rem);letter-spacing:.04em;display:flex;gap:.06em}
+#loader .lname span{display:inline-block;animation:lUp .8s ease-in-out infinite alternate;animation-delay:calc(var(--i)*.07s)}
+#loader .lname span.lime{color:var(--lime)}
+@keyframes lUp{from{transform:translateY(0);opacity:.45}to{transform:translateY(-12px);opacity:1}}
+#loader .lbar{width:min(280px,60vw);height:4px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden}
+#loader .lbar i{display:block;height:100%;width:40%;background:var(--lime);border-radius:99px;animation:lSlide 1s ease-in-out infinite alternate}
+@keyframes lSlide{from{transform:translateX(-60%)}to{transform:translateX(320%)}}
+#loader p{margin:0;color:var(--muted);font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;font-weight:700}
+
+/* nav */
+header{position:fixed;top:14px;left:0;right:0;z-index:300}
+.nav{display:flex;align-items:center;gap:16px;background:rgba(10,10,18,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;padding:9px 10px 9px 20px}
+.logo{font-family:'Unbounded';font-weight:900;font-size:1rem;text-decoration:none;letter-spacing:.02em;white-space:nowrap}
+.logo em{font-style:normal;color:var(--lime)}
+.logo .dot3d{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--violet);margin-left:6px;animation:blinkDot 1.6s ease-in-out infinite;vertical-align:middle}
+@keyframes blinkDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.55}}
+.nav nav{display:flex;gap:2px;margin-left:auto}
+.nav nav a{text-decoration:none;font-weight:700;font-size:.88rem;color:var(--muted);padding:8px 13px;border-radius:999px;transition:color .2s,background .2s}
+.nav nav a:hover{color:var(--text);background:rgba(255,255,255,.07)}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;background:var(--lime);color:#0b0b08;border:0;border-radius:999px;padding:12px 24px;font-weight:800;text-decoration:none;font-size:.92rem;cursor:pointer;font-family:'Manrope';transition:transform .16s,box-shadow .16s;box-shadow:0 0 0 rgba(198,255,58,0)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(198,255,58,.28)}
+.btn::after{content:"";position:absolute;top:0;left:-70%;width:40%;height:100%;background:rgba(255,255,255,.5);transform:skewX(-20deg);animation:shine 2.8s ease-in-out infinite}
+@keyframes shine{0%,55%{left:-70%}90%,100%{left:135%}}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.25);box-shadow:none}
+.btn.ghost:hover{border-color:var(--lime);color:var(--lime);box-shadow:0 10px 30px rgba(198,255,58,.12)}
+.btn.violet{background:var(--violet);color:#fff}
+.btn.violet:hover{box-shadow:0 10px 30px rgba(139,92,246,.35)}
+.hire{padding:10px 20px;white-space:nowrap}
+
+/* ambient bg */
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bgfx::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,#000 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,#000 30%,transparent 75%)}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:orbFloat 14s ease-in-out infinite alternate}
+.orb.o1{width:480px;height:480px;background:rgba(198,255,58,.16);top:-160px;left:-120px}
+.orb.o2{width:520px;height:520px;background:rgba(139,92,246,.22);top:10%;right:-180px;animation-delay:-6s}
+.orb.o3{width:380px;height:380px;background:rgba(58,224,255,.12);bottom:-140px;left:36%;animation-delay:-3s}
+@keyframes orbFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(50px,36px) scale(1.12)}}
+.grain{position:fixed;inset:-60px;z-index:250;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");animation:grainShift .9s steps(4) infinite}
+@keyframes grainShift{0%{transform:translate(0,0)}25%{transform:translate(-18px,12px)}50%{transform:translate(14px,-16px)}75%{transform:translate(-10px,-8px)}100%{transform:translate(0,0)}}
+
+/* hero */
+.hero{position:relative;padding:158px 0 40px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}
+@media(max-width:960px){.hero-grid{grid-template-columns:1fr}}
+.kicker{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(198,255,58,.4);background:var(--lime-dim);color:var(--lime);border-radius:999px;padding:6px 15px;font-size:.76rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.kicker i{width:8px;height:8px;border-radius:50%;background:var(--lime);animation:blinkDot 1.4s infinite}
+/* --- 3D hero name: real CSS-3D extrusion (layered translateZ copies under a
+   glossy face, seen through perspective; no WebGL needed, so the name can
+   never vanish if 3D fails — the face + text-shadow depth remain). --- */
+.hero h1{font-size:clamp(3rem,8.6vw,6.4rem);font-weight:900;letter-spacing:.005em;margin:26px 0 4px;text-transform:uppercase;perspective:1100px;transform-style:preserve-3d}
+.hero h1 .name-row{display:block;white-space:nowrap;overflow:visible;padding:.02em .14em .18em 0;transform-style:preserve-3d;animation:nameSway 6s ease-in-out infinite;will-change:transform}
+.hero h1 .name-row.row2{animation-delay:-3s}
+@keyframes nameSway{0%,100%{transform:rotateX(15deg) rotateY(-13deg) translateY(0)}50%{transform:rotateX(19deg) rotateY(-5deg) translateY(-6px)}}
+.ch3d{position:relative;display:inline-block;transform-style:preserve-3d;animation:ch3dBob 3.4s ease-in-out infinite;animation-delay:calc(var(--i)*.09s);will-change:transform}
+@keyframes ch3dBob{0%,100%{transform:translateY(0) translateZ(0)}30%{transform:translateY(-6px) translateZ(6px)}60%{transform:translateY(2px) translateZ(0)}}
+.ch-face{position:relative;z-index:2;display:inline-block;background:linear-gradient(180deg,#f2ffd6 0%,var(--lime) 38%,#8fd400 62%,#5a9e00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 #d9ff7a,1px 1px 0 #b8ec4a,2px 2px 0 #93c92e,3px 3px 0 #6f9c1d,4px 4px 0 #4f7016,5px 5px 0 #3a5210,6px 6px 0 #22330a,8px 10px 18px rgba(0,0,0,.55),0 0 34px rgba(198,255,58,.3)}
+.ch3d .ch-depth{position:absolute;left:0;top:0;z-index:1;display:inline-block;color:var(--depth,#3a5210);transform:translateZ(calc(var(--z) * -1.35px));pointer-events:none;user-select:none}
+.ch3d.hollow .ch-face{background:none;-webkit-text-stroke:2px var(--text);color:transparent;text-shadow:0 1px 0 rgba(244,244,236,.55),1px 1px 0 rgba(190,190,200,.5),2px 2px 0 rgba(140,140,160,.55),3px 3px 0 rgba(110,100,170,.6),4px 4px 0 rgba(80,70,140,.65),5px 5px 0 rgba(60,50,110,.7),6px 6px 0 rgba(40,32,80,.75),8px 10px 18px rgba(0,0,0,.55)}
+.ch3d.hollow .ch-depth{color:transparent;-webkit-text-stroke:2px var(--depth,#6b5aa8)}
+.name3d.has-depth .ch-face{text-shadow:0 0 34px rgba(198,255,58,.28)}
+.name3d.has-depth .ch3d.hollow .ch-face{text-shadow:0 0 22px rgba(139,92,246,.25)}
+@media(max-width:760px){
+  .hero h1{font-size:clamp(2.2rem,12.8vw,3.1rem)}
+  .ch3d .ch-depth{transform:translateZ(calc(var(--z) * -.9px))}
+  .ch3d.hollow .ch-face,.ch3d.hollow .ch-depth{-webkit-text-stroke-width:1.5px}
+  @keyframes nameSway{0%,100%{transform:rotateX(12deg) rotateY(-9deg) translateY(0)}50%{transform:rotateX(15deg) rotateY(-4deg) translateY(-4px)}}
+}
+.roleline{margin:20px 0 0;font-size:clamp(1.05rem,2.6vw,1.45rem);font-weight:700;color:var(--muted);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rolebox{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-bottom:3px solid var(--lime);border-radius:10px;padding:3px 16px;color:var(--text);min-width:250px;text-align:center;font-family:'JetBrains Mono';font-size:.92em}
+#roleWord{display:inline-block}
+#roleWord.swap{animation:roleIn .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes roleIn{from{transform:translateY(9px);opacity:.3}to{transform:translateY(0);opacity:1}}
+.hero-intro{color:var(--muted);max-width:560px;font-size:1.04rem;margin:16px 0 0}
+.hero-intro strong{color:var(--text)}
+.hero-cta{display:flex;gap:13px;flex-wrap:wrap;margin:28px 0 0}
+.hero-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.stat{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:14px;padding:10px 16px;animation:statFloat 4.5s ease-in-out infinite;animation-delay:calc(var(--i)*.5s)}
+.stat b{font-family:'Unbounded';font-size:.98rem;color:var(--lime);display:block;line-height:1.2}
+.stat span{font-size:.74rem;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+@keyframes statFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* 3D stage */
+.stage{position:relative;height:540px;border-radius:26px;border:1px solid var(--line);background:radial-gradient(circle at 50% 38%,rgba(139,92,246,.16),rgba(10,10,18,.2) 62%),linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0));overflow:hidden}
+@media(max-width:960px){.stage{height:420px}}
+@media(max-width:560px){.stage{height:340px}}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.stage .hud{position:absolute;font-family:'JetBrains Mono';font-size:.68rem;letter-spacing:.12em;color:rgba(244,244,236,.6);text-transform:uppercase;z-index:3;pointer-events:none}
+.hud.tl{top:14px;left:16px}.hud.tr{top:14px;right:16px;color:var(--lime)}
+.hud.bl{bottom:14px;left:16px}.hud.br{bottom:14px;right:16px}
+.hud .rec{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3b3b;margin-right:6px;animation:blinkDot 1.1s infinite;vertical-align:middle}
+.css-fallback{position:absolute;inset:0;display:none;place-items:center;z-index:1}
+.css-fallback .disc{width:190px;height:190px;border-radius:50%;border:3px solid var(--lime);display:grid;place-items:center;background:radial-gradient(circle,rgba(198,255,58,.14),transparent 70%);animation:discSpin 9s linear infinite}
+.css-fallback .disc::before{content:"▶";font-size:4rem;color:var(--lime)}
+@keyframes discSpin{to{transform:rotate(360deg)}}
+.stage.nogl .css-fallback{display:grid}
+.stage.nogl #gl{display:none}
+.scroll-hint{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);color:var(--muted2);font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;font-weight:800;animation:hintBob 2s ease-in-out infinite;white-space:nowrap}
+@keyframes hintBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+
+/* marquee */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(255,255,255,.02);overflow:hidden;white-space:nowrap;padding:13px 0;margin-top:56px;position:relative;z-index:2}
+.marquee .track{display:inline-flex;width:max-content;animation:marq 26s linear infinite;will-change:transform}
+.marquee.rev .track{animation-direction:reverse;animation-duration:31s}
+.marquee span{font-family:'Unbounded';font-size:.92rem;text-transform:uppercase;padding:0 18px;display:inline-flex;gap:18px;align-items:center;color:var(--muted)}
+.marquee span b{color:var(--lime);font-weight:700}
+.marquee.limebar{background:var(--lime);transform:rotate(-1.1deg) scale(1.02);margin-top:0;border:0}
+.marquee.limebar span{color:#101008}
+.marquee.limebar span b{color:#101008}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* sections */
+section{padding:88px 0 8px;position:relative}
+.sec-head{margin-bottom:34px;max-width:760px}
+.sec-tag{display:inline-block;font-family:'JetBrains Mono';font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--lime);border:1px solid rgba(198,255,58,.35);background:var(--lime-dim);padding:5px 13px;border-radius:999px;margin-bottom:16px}
+.sec-head h2{font-size:clamp(1.9rem,5.4vw,3.2rem);text-transform:uppercase}
+.sec-head h2 .grad{background:linear-gradient(90deg,var(--lime),var(--cyan),var(--violet),var(--lime));background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gradShift 4.5s linear infinite}
+.sec-head p{color:var(--muted);margin:14px 0 0;font-size:1.02rem}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.in .lifey{animation:cardLife 6s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes cardLife{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* generic cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:18px}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;position:relative;overflow:hidden;transition:border-color .25s,transform .25s}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(198,255,58,.5),transparent);opacity:0;transition:opacity .3s}
+.card:hover{border-color:rgba(198,255,58,.35);transform:translateY(-4px)}
+.card:hover::before{opacity:1}
+.card .ic{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;margin-bottom:15px;background:var(--lime-dim);border:1px solid rgba(198,255,58,.25);animation:icFloat 3.6s ease-in-out infinite;animation-delay:calc(var(--i)*.22s)}
+.card .ic svg{width:25px;height:25px;stroke:var(--lime)}
+.card:nth-child(3n+2) .ic{background:var(--violet-dim);border-color:rgba(139,92,246,.3)}
+.card:nth-child(3n+2) .ic svg{stroke:#c4a6ff}
+.card:nth-child(3n) .ic{background:rgba(58,224,255,.1);border-color:rgba(58,224,255,.28)}
+.card:nth-child(3n) .ic svg{stroke:var(--cyan)}
+@keyframes icFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(3deg)}}
+.card h3{font-size:.98rem;font-family:'Manrope';font-weight:800;letter-spacing:.01em;margin-bottom:7px}
+.card p{margin:0;color:var(--muted);font-size:.94rem}
+.card .num{position:absolute;top:16px;right:20px;font-family:'JetBrains Mono';font-size:.72rem;color:var(--muted2)}
+
+/* about */
+.about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+@media(max-width:860px){.about-grid{grid-template-columns:1fr}}
+.about-main p.big{font-size:1.13rem;color:var(--text);margin:0 0 14px}
+.about-main p{color:var(--muted);margin:0 0 12px}
+.chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.chips span{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:6px 14px;font-size:.84rem;font-weight:700;animation:statFloat 4.5s ease-in-out infinite;animation-delay:calc(var(--i)*.4s)}
+.chips span.hl{border-color:rgba(198,255,58,.4);color:var(--lime)}
+.strength{display:flex;gap:13px;padding:15px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.strength:last-child{border-bottom:0}
+.strength .sic{flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:var(--violet-dim);border:1px solid rgba(139,92,246,.3);display:grid;place-items:center;animation:icFloat 3.8s ease-in-out infinite;animation-delay:calc(var(--i)*.3s)}
+.strength .sic svg{width:21px;height:21px;stroke:#c4a6ff}
+.strength b{display:block;font-size:.97rem}
+.strength span{color:var(--muted);font-size:.9rem}
+
+/* editor desk */
+.desk{background:#0a0a13;border:1px solid var(--line);border-radius:24px;padding:22px;position:relative;overflow:hidden}
+.desk::after{content:"";position:absolute;inset:0;background:radial-gradient(600px 200px at 80% -10%,rgba(139,92,246,.14),transparent 70%);pointer-events:none}
+.desk-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:relative;z-index:2}
+.desk-top .win{display:flex;gap:7px}
+.desk-top .win i{width:12px;height:12px;border-radius:50%;display:block}
+.desk-top .win i:nth-child(1){background:#ff5f57}.desk-top .win i:nth-child(2){background:#febc2e}.desk-top .win i:nth-child(3){background:#28c840}
+.desk-name{font-family:'JetBrains Mono';font-size:.78rem;color:var(--muted)}
+#timecode{font-family:'JetBrains Mono';font-weight:700;background:#000;border:1px solid rgba(198,255,58,.5);color:var(--lime);padding:5px 13px;border-radius:9px;font-size:.95rem;letter-spacing:.1em;min-width:148px;text-align:center}
+.timeline{position:relative;margin-top:18px;background:#10101c;border:1px solid var(--line);border-radius:14px;padding:12px 12px 10px;overflow:hidden;z-index:2}
+.ruler{display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:.6rem;color:var(--muted2);padding-bottom:8px}
+.trow{display:flex;gap:5px;margin-bottom:6px;position:relative;z-index:1}
+.clip{height:29px;border-radius:6px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid rgba(0,0,0,.5)}
+.clip::after{content:"";position:absolute;top:0;left:-60%;width:32%;height:100%;background:rgba(255,255,255,.35);transform:skewX(-18deg);animation:shine 3.2s ease-in-out infinite}
+.clip small{position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:.6rem;font-weight:800;color:rgba(0,0,0,.72);white-space:nowrap;letter-spacing:.03em}
+#playhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 10px var(--lime),0 0 2px #fff;z-index:3;animation:playSweep 5.5s linear infinite}
+#playhead::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top:8px solid var(--lime)}
+@keyframes playSweep{from{left:1.2%}to{left:98.6%}}
+.bars{margin-top:24px;display:grid;gap:16px;position:relative;z-index:2}
+.bar-row{display:grid;grid-template-columns:190px 1fr 50px;gap:13px;align-items:center}
+.bar-row label{font-weight:800;font-size:.93rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bar-row label .tag{font-size:.6rem;background:var(--lime);color:#0b0b08;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
+.bar{height:13px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;animation:barLoop var(--dur,5.4s) ease-in-out infinite;animation-delay:var(--bd,0s);position:relative}
+.bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:translateX(-100%);animation:barShine 1.8s ease-in-out infinite}
+@keyframes barLoop{0%{width:0}34%{width:var(--lvl)}62%{width:var(--lvl)}88%{width:0}100%{width:0}}
+@keyframes barShine{from{transform:translateX(-100%)}to{transform:translateX(240%)}}
+.bar-pct{font-family:'JetBrains Mono';font-weight:700;color:var(--lime);font-size:.9rem;text-align:right}
+@media(max-width:640px){.bar-row{grid-template-columns:1fr 46px}.bar{grid-column:1/-1;order:3}}
+
+/* showreel + work */
+.reel-frame{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:26px;padding:14px;position:relative}
+.reel-frame::before{content:"";position:absolute;inset:-1px;border-radius:26px;padding:1px;background:linear-gradient(120deg,rgba(198,255,58,.55),rgba(139,92,246,.5),rgba(58,224,255,.4),rgba(198,255,58,.55));background-size:260% 100%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:gradShift 5s linear infinite;pointer-events:none}
+.player{position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:16/9}
+.player video{width:100%;height:100%;object-fit:cover}
+.play-overlay{position:absolute;inset:0;display:grid;place-items:center;background:rgba(5,5,12,.3);cursor:pointer;border:0;width:100%;transition:opacity .3s}
+.play-overlay.hidden{opacity:0;pointer-events:none}
+.play-btn{position:relative;width:88px;height:88px;border-radius:50%;background:var(--lime);display:grid;place-items:center;color:#0b0b08;animation:playPulse 1.6s ease-in-out infinite}
+.play-btn svg{width:30px;height:30px;margin-left:4px}
+.play-btn::before,.play-btn::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--lime);animation:ringOut 1.9s ease-out infinite}
+.play-btn::after{animation-delay:.65s}
+@keyframes playPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+@keyframes thumbPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.09)}}
+@keyframes ringOut{from{transform:scale(1);opacity:.85}to{transform:scale(1.75);opacity:0}}
+.dur{position:absolute;right:12px;bottom:12px;background:rgba(0,0,0,.75);border:1px solid rgba(198,255,58,.5);color:var(--lime);border-radius:8px;font-family:'JetBrains Mono';font-weight:700;padding:2px 10px;font-size:.8rem;z-index:2}
+.reel-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:15px}
+.reel-meta h3{font-family:'Manrope';font-weight:800;font-size:1.05rem}
+.pilltag{font-size:.7rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:4px 11px;color:var(--muted)}
+.pilltag.lime{color:var(--lime);border-color:rgba(198,255,58,.4)}
+.filterbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:22px}
+.fbtn{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);border-radius:999px;padding:9px 19px;font-weight:800;cursor:pointer;font-family:'Manrope';font-size:.88rem;transition:all .2s}
+.fbtn:hover{color:var(--text);border-color:rgba(198,255,58,.4)}
+.fbtn.on{background:var(--lime);color:#0b0b08;border-color:var(--lime)}
+.work-card{padding:0;overflow:hidden;cursor:pointer;text-align:left;font:inherit;width:100%;color:var(--text)}
+.work-card .thumb{position:relative;aspect-ratio:16/9;overflow:hidden;border-bottom:1px solid var(--line)}
+.work-card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
+.work-card:hover .thumb img{transform:scale(1.06)}
+.work-card .body{padding:17px 19px 19px;display:block}
+.work-hide{display:none!important}
+
+/* thumbnails gallery (image-only: same glass cards, tap to view full size;
+   landscape cards keep 16:9; portrait Shorts cards keep their own 9:16 ratio) */
+#thumbGrid{grid-template-columns:repeat(6,minmax(0,1fr));align-items:start}
+.thumb-card.landscape{grid-column:span 2}
+.thumb-card.portrait{grid-column:span 2}
+@media(min-width:901px){
+  /* Row 1: the first three landscapes, 3 across. Row 2: the two new landscapes,
+     2 across. Row 3: the two portrait Shorts cards side by side, centred. */
+  #thumbRoom206{grid-column:1/span 3;grid-row:2}
+  #thumbFears{grid-column:4/span 3;grid-row:2}
+  #thumbKidnap{grid-column:2/span 2;grid-row:3}
+  #thumbTrying{grid-column:4/span 2;grid-row:3}
+}
+@media(min-width:600px) and (max-width:900px){
+  /* 2 across: first three landscapes, then Room 206 beside card 3, Fears full
+     width, then the two portraits side by side. */
+  #thumbGrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #thumbRoom206{grid-column:3/span 2;grid-row:2}
+  #thumbFears{grid-column:1/-1;grid-row:3}
+  #thumbKidnap{grid-column:1/span 2;grid-row:4}
+  #thumbTrying{grid-column:3/span 2;grid-row:4}
+}
+@media(max-width:599px){#thumbGrid{grid-template-columns:minmax(0,1fr)}#thumbGrid .thumb-card{grid-column:auto;grid-row:auto}}
+.thumb-card{padding:0;overflow:hidden;cursor:pointer;text-align:left;font:inherit;width:100%;color:var(--text);display:flex;flex-direction:column}
+.thumb-card .thumb-img{position:relative;aspect-ratio:16/9;overflow:hidden;border-bottom:1px solid var(--line);display:block}
+.thumb-card.portrait .thumb-img{aspect-ratio:9/16}
+.thumb-card .thumb-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
+.thumb-card:hover .thumb-img img{transform:scale(1.05)}
+.thumb-card .thumb-body{padding:17px 19px 19px;display:block;flex:1 1 auto}
+.thumb-card h3{font-size:1.02rem;line-height:1.35;margin:11px 0 6px;font-family:'Manrope';font-weight:800}
+.thumb-card p{margin:0;color:var(--muted);font-size:.9rem}
+.thumb-view{position:absolute;right:12px;bottom:12px;z-index:2;background:rgba(0,0,0,.68);border:1px solid rgba(198,255,58,.55);color:var(--lime);border-radius:99px;font-family:'JetBrains Mono',monospace;font-weight:700;padding:4px 11px;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+#thumbLightboxImg{display:block;width:100%;height:auto;max-height:76vh;object-fit:contain;border-radius:14px;background:#000;border:1px solid rgba(255,255,255,.25)}
+#thumbLightboxImg.portrait{width:auto;max-width:100%;margin:0 auto}
+.lb-panel.wide{width:min(1100px,94vw)}
+.lb-panel.wide.portrait{width:min(460px,94vw)}
+
+/* 3D coverflow */
+.cf-zone{position:relative}
+.cf-view{position:relative;height:410px;perspective:1400px;overflow:hidden;border:1px solid var(--line);border-radius:26px;background:radial-gradient(circle at 50% 26%,rgba(198,255,58,.08),transparent 55%),linear-gradient(180deg,#0e0e1a,#0a0a12);touch-action:pan-y;cursor:grab}
+.cf-view:active{cursor:grabbing}
+.cf-track{position:absolute;inset:0;transform-style:preserve-3d}
+.cf-slide{position:absolute;left:50%;top:50%;width:min(330px,78vw);background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid rgba(255,255,255,.14);border-radius:20px;overflow:hidden;transition:transform .65s cubic-bezier(.22,1.15,.32,1),opacity .65s;backface-visibility:hidden;box-shadow:0 24px 50px rgba(0,0,0,.5)}
+.cf-slide .simg{height:148px;border-bottom:1px solid var(--line);overflow:hidden}
+.cf-slide .simg img{width:100%;height:100%;object-fit:cover}
+.cf-slide .sic{height:118px;display:grid;place-items:center;border-bottom:1px solid var(--line)}
+.cf-slide .sic svg{width:52px;height:52px;animation:icFloat 3s ease-in-out infinite}
+.cf-slide .sbody{padding:16px 18px 19px}
+.cf-slide h3{font-family:'Manrope';font-weight:800;font-size:1.06rem;margin:8px 0 5px}
+.cf-slide p{margin:0;color:var(--muted);font-size:.9rem}
+.cf-controls{display:flex;gap:13px;align-items:center;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.cf-btn{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:1.2rem;cursor:pointer;transition:all .2s;font-family:'Manrope'}
+.cf-btn:hover{border-color:var(--lime);color:var(--lime);transform:translateY(-2px)}
+.cf-dots{display:flex;gap:8px}
+.cf-dots button{width:10px;height:10px;border-radius:50%;border:0;background:rgba(255,255,255,.25);cursor:pointer;padding:0;transition:all .25s}
+.cf-dots button.on{background:var(--lime);transform:scale(1.35)}
+#cfLabel{font-family:'JetBrains Mono';font-size:.76rem;letter-spacing:.08em;color:var(--lime);border:1px solid rgba(198,255,58,.35);background:var(--lime-dim);padding:6px 15px;border-radius:99px;text-transform:uppercase}
+@media(max-width:640px){.cf-view{height:380px}}
+
+/* career timeline */
+.tl{position:relative;margin-left:8px;padding-left:30px;border-left:1px solid var(--line);display:grid;gap:20px}
+.tl::before{content:"";position:absolute;left:-1px;top:0;width:2px;height:100%;background:linear-gradient(180deg,var(--lime),var(--violet),var(--cyan));background-size:100% 220%;animation:gradShiftY 4s linear infinite;opacity:.7}
+@keyframes gradShiftY{to{background-position:0 220%}}
+.tl-item{position:relative}
+.tl-item::before{content:"";position:absolute;left:-39px;top:24px;width:15px;height:15px;border-radius:50%;background:var(--bg);border:3px solid var(--lime);animation:blinkDot 2.2s ease-in-out infinite}
+.tl-item:nth-child(2)::before{border-color:var(--violet)}
+.tl-item:nth-child(3)::before{border-color:var(--cyan)}
+.tl-item .when{font-family:'JetBrains Mono';font-size:.72rem;letter-spacing:.14em;color:var(--lime);text-transform:uppercase;font-weight:700}
+.tl-item h3{font-family:'Manrope';font-weight:800;font-size:1.14rem;margin:5px 0 6px}
+.tl-item p{color:var(--muted);margin:0;font-size:.96rem}
+
+/* tech stack */
+.stack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.tool{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:20px 14px;text-align:center;transition:transform .22s,border-color .22s}
+.tool:hover{transform:translateY(-5px) rotate(-1deg);border-color:rgba(198,255,58,.4)}
+.tool .tic{width:52px;height:52px;margin:0 auto 11px;border-radius:14px;display:grid;place-items:center;font-family:'Unbounded';font-weight:900;font-size:.85rem;animation:icFloat 3.8s ease-in-out infinite;animation-delay:calc(var(--i)*.26s)}
+.tool b{display:block;font-size:.94rem}
+.tool span{font-size:.78rem;color:var(--muted)}
+.t-lime{background:var(--lime-dim);color:var(--lime);border:1px solid rgba(198,255,58,.3)}
+.t-violet{background:var(--violet-dim);color:#c4a6ff;border:1px solid rgba(139,92,246,.32)}
+.t-cyan{background:rgba(58,224,255,.1);color:var(--cyan);border:1px solid rgba(58,224,255,.3)}
+.t-pink{background:rgba(255,77,126,.1);color:#ff8fab;border:1px solid rgba(255,77,126,.3)}
+
+/* pricing */
+.price-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:stretch}
+@media(max-width:860px){.price-wrap{grid-template-columns:1fr}}
+.price-card{background:linear-gradient(150deg,rgba(198,255,58,.13),rgba(198,255,58,.03) 55%),var(--panel);border:1px solid rgba(198,255,58,.35);border-radius:26px;padding:30px;position:relative;overflow:hidden}
+.price-card .big{font-family:'Unbounded';font-weight:900;font-size:clamp(2.8rem,8vw,4.6rem);color:var(--lime);line-height:1.05;text-shadow:0 0 36px rgba(198,255,58,.3)}
+.price-card ul{list-style:none;padding:0;margin:20px 0 24px;display:grid;gap:11px}
+.price-card li{display:flex;gap:11px;align-items:flex-start;color:var(--muted)}
+.price-card li b{flex:0 0 23px;width:23px;height:23px;border-radius:50%;background:var(--lime);color:#0b0b08;display:grid;place-items:center;font-size:.76rem;margin-top:2px}
+.philo-card{display:flex;flex-direction:column;gap:18px}
+.philo{flex:1;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:26px;padding:26px;display:flex;flex-direction:column;justify-content:center}
+.philo h3{font-size:clamp(1.3rem,3.4vw,1.8rem);text-transform:uppercase}
+.philo h3 span{color:var(--lime)}
+.philo p{color:var(--muted);margin:9px 0 0}
+
+/* process */
+.step-n{font-family:'Unbounded';font-weight:900;font-size:1.7rem;color:transparent;-webkit-text-stroke:1.5px var(--lime);margin-bottom:13px;animation:statFloat 4s ease-in-out infinite;animation-delay:calc(var(--i)*.4s)}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media(max-width:860px){.contact-grid{grid-template-columns:1fr}}
+.c-link{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:15px 17px;text-decoration:none;margin-bottom:12px;transition:all .2s;word-break:break-word}
+.c-link:hover{border-color:rgba(198,255,58,.45);transform:translateX(5px)}
+.c-link .cic{flex:0 0 44px;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--lime-dim);border:1px solid rgba(198,255,58,.28)}
+.c-link .cic svg{width:21px;height:21px;stroke:var(--lime)}
+.c-link small{display:block;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;font-size:.66rem;font-weight:800}
+.c-link b{font-size:.99rem}
+form{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:22px;padding:24px}
+form label{font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.07em;display:block;margin:14px 0 6px;color:var(--muted)}
+form label:first-child{margin-top:0}
+form input,form textarea,form select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;background:#0b0b14;color:var(--text)}
+form input:focus,form textarea:focus,form select:focus{outline:2px solid var(--lime);outline-offset:1px;border-color:transparent}
+#formOk{display:none;margin-top:16px;background:var(--lime-dim);border:1px solid rgba(198,255,58,.45);color:var(--lime);border-radius:13px;padding:14px 16px;font-weight:700;animation:roleIn .4s cubic-bezier(.2,1.6,.4,1)}
+footer{margin-top:90px;border-top:1px solid var(--line);background:#05050a;padding:34px 0 40px;position:relative;z-index:2}
+footer .frow{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+footer p{color:var(--muted);margin:4px 0;font-size:.9rem}
+footer a{color:var(--lime);font-weight:700;text-decoration:none}
+footer a:hover{text-decoration:underline}
+.credit{font-size:.8rem;color:var(--muted2)}
+.credit a{color:var(--muted);font-weight:600}
+
+@media(max-width:760px){
+  header{top:8px}
+  .nav{border-radius:20px;flex-wrap:wrap;padding:10px 12px}
+  .nav nav{order:3;flex-basis:100%;flex-wrap:wrap;justify-content:flex-start;overflow:visible}
+  .nav nav a{padding:6px 9px;font-size:.82rem;white-space:nowrap}
+  .hire{margin-left:auto;padding:8px 15px;font-size:.82rem}
+  .hero{padding-top:172px}
+  section{padding-top:64px}
+}
+/* ===== EXTRA 3D SCENES ===== */
+#starCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.5}
+.mascot-wrap{position:fixed;right:14px;bottom:14px;width:132px;height:132px;z-index:280;pointer-events:none;filter:drop-shadow(0 12px 24px rgba(0,0,0,.45))}
+.mascot-wrap canvas{width:100%;height:100%;display:block}
+.mascot-tag{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);font-family:'JetBrains Mono';font-size:.55rem;letter-spacing:.14em;color:var(--lime);background:rgba(0,0,0,.55);border:1px solid rgba(198,255,58,.35);padding:2px 8px;border-radius:99px;white-space:nowrap}
+@media(max-width:560px){.mascot-wrap{width:92px;height:92px;right:8px;bottom:8px}}
+.mini3d{position:relative;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:radial-gradient(circle at 50% 40%,rgba(139,92,246,.14),rgba(10,10,18,.25) 65%)}
+.mini3d canvas{width:100%;height:100%;display:block}
+.mini3d .hud{position:absolute;font-family:'JetBrains Mono';font-size:.62rem;letter-spacing:.12em;color:rgba(244,244,236,.55);text-transform:uppercase;z-index:2;pointer-events:none}
+.mini3d .hud.tl{top:10px;left:12px}.mini3d .hud.tr{top:10px;right:12px;color:var(--lime)}
+.about-3d{height:250px;margin-top:18px}
+.svc-3d{height:230px;margin-bottom:22px}
+.stack-3d{height:320px;margin-bottom:22px}
+.contact-3d{height:190px;margin-bottom:20px}
+.work-3d-wrap{position:relative}
+#glWork{position:absolute;inset:-30px -10px; width:calc(100% + 20px);height:calc(100% + 60px);z-index:0;pointer-events:none;opacity:.55}
+.work-3d-wrap .grid{position:relative;z-index:1}
+@media(max-width:760px){.svc-3d{height:180px}.stack-3d{height:240px}.about-3d{height:200px}}
+
+/* ===== APPLE-STYLE LIQUID GLASS LAYER (original CSS, no Apple assets) ===== */
+:root{--glass-brd:rgba(255,255,255,.28);--glass-fill:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 42%,rgba(198,255,58,.07) 78%,rgba(139,92,246,.10));--glass-shadow:0 18px 40px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(255,255,255,.08),inset 1px 0 0 rgba(255,255,255,.14)}
+.nav,.card,.stat,.chips span,.cf-slide,.price-card,.philo,form,.c-link,.tool,.reel-frame,.desk,.rolebox,.mini3d,.tl-item{
+  background:var(--glass-fill),linear-gradient(180deg,rgba(23,23,40,.72),rgba(14,14,24,.78))!important;
+  -webkit-backdrop-filter:blur(16px) saturate(170%);backdrop-filter:blur(16px) saturate(170%);
+  border:1px solid var(--glass-brd)!important;box-shadow:var(--glass-shadow);
+}
+.nav{border-radius:999px}
+.btn{border:1px solid rgba(255,255,255,.5)!important;box-shadow:0 10px 28px rgba(198,255,58,.22),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -6px 14px rgba(0,0,0,.12);-webkit-backdrop-filter:blur(10px) saturate(160%);backdrop-filter:blur(10px) saturate(160%);transition:transform .45s cubic-bezier(.2,1.8,.35,1),box-shadow .3s}
+.btn.ghost{background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.05))!important;color:var(--text)}
+.fbtn,.cf-btn{ background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04));-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);border:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 8px 20px rgba(0,0,0,.3);transition:transform .45s cubic-bezier(.2,1.8,.35,1),border-color .25s}
+.fbtn.on{background:var(--lime)!important;color:#0b0b08}
+/* specular shine band sweeping in a loop */
+.nav,.price-card,.reel-frame,.mini3d,.desk{position:relative}
+.nav::after,.price-card .shineband,.mini3d::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.16) 48%,rgba(255,255,255,.03) 55%,transparent 70%);background-size:260% 100%;animation:glassSweep 5.5s ease-in-out infinite}
+.mini3d::after{z-index:2}
+@keyframes glassSweep{0%{background-position:130% 0}55%,100%{background-position:-130% 0}}
+.card,.tool,.c-link,.cf-slide{transition:transform .5s cubic-bezier(.2,1.7,.35,1),border-color .25s,box-shadow .3s}
+.card:hover,.tool:hover,.c-link:hover{transform:translateY(-5px) scale(1.012);box-shadow:0 24px 48px rgba(0,0,0,.45),0 0 0 1px rgba(198,255,58,.18),inset 0 1px 0 rgba(255,255,255,.55)}
+/* morphing liquid blobs */
+.glass-blob{position:absolute;border-radius:58% 42% 55% 45%/52% 58% 42% 48%;background:linear-gradient(135deg,rgba(198,255,58,.28),rgba(139,92,246,.30) 55%,rgba(58,224,255,.22));-webkit-backdrop-filter:blur(6px) saturate(180%);backdrop-filter:blur(6px) saturate(180%);border:1px solid rgba(255,255,255,.4);box-shadow:inset 0 2px 6px rgba(255,255,255,.55),inset -8px -12px 24px rgba(139,92,246,.25),0 18px 36px rgba(0,0,0,.3);animation:blobMorph 9s ease-in-out infinite alternate;pointer-events:none;z-index:3}
+.gb1{width:120px;height:120px;top:18px;right:22px}
+.gb2{width:74px;height:74px;bottom:20px;left:20px;animation-delay:-4s;animation-duration:11s}
+@keyframes blobMorph{0%{border-radius:58% 42% 55% 45%/52% 58% 42% 48%;transform:rotate(0deg) scale(1)}50%{border-radius:42% 58% 38% 62%/60% 40% 62% 40%;transform:rotate(14deg) scale(1.08)}100%{border-radius:64% 36% 48% 52%/40% 62% 38% 60%;transform:rotate(-10deg) scale(.95)}}
+/* glass ring around hero 3D play disc + wobble chip (SVG displacement, one element only) */
+.glass-ring{position:absolute;left:50%;top:44%;width:270px;height:270px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:radial-gradient(circle,transparent 58%,rgba(255,255,255,.07) 72%,rgba(198,255,58,.10) 88%,transparent 100%);box-shadow:inset 0 2px 10px rgba(255,255,255,.35),inset 0 -14px 30px rgba(139,92,246,.18),0 0 44px rgba(198,255,58,.12);animation:ringPulse 5s ease-in-out infinite;pointer-events:none;z-index:2}
+@keyframes ringPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.85}50%{transform:translate(-50%,-50%) scale(1.045);opacity:1}}
+.glass-chip{position:absolute;left:16px;bottom:44px;z-index:4;padding:8px 16px;border-radius:999px;font-family:'JetBrains Mono';font-size:.66rem;letter-spacing:.14em;color:#fff;background:linear-gradient(135deg,rgba(255,255,255,.24),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 10px 24px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(10px) saturate(180%);backdrop-filter:blur(10px) saturate(180%);filter:url(#liquidWobble);pointer-events:none}
+.mascot-wrap{background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.22),rgba(255,255,255,.05) 55%,rgba(139,92,246,.10));border:1px solid rgba(255,255,255,.35);border-radius:58% 42% 55% 45%/52% 58% 42% 48%;-webkit-backdrop-filter:blur(10px) saturate(170%);backdrop-filter:blur(10px) saturate(170%);box-shadow:inset 0 2px 6px rgba(255,255,255,.5),0 18px 36px rgba(0,0,0,.4);animation:blobMorph 12s ease-in-out infinite alternate;overflow:visible}
+.mascot-tag{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);background:rgba(10,10,18,.55)}
+/* caustic light spots behind glass cards */
+section .wrap::before{content:"";position:absolute;inset:-30px -4vw auto;height:340px;background:radial-gradient(320px 150px at 18% 30%,rgba(198,255,58,.10),transparent 70%),radial-gradient(380px 180px at 84% 12%,rgba(139,92,246,.13),transparent 70%),radial-gradient(260px 140px at 60% 90%,rgba(58,224,255,.08),transparent 70%);pointer-events:none;z-index:0}
+.kicker{background:linear-gradient(135deg,rgba(198,255,58,.28),rgba(255,255,255,.06));-webkit-backdrop-filter:blur(10px) saturate(170%);backdrop-filter:blur(10px) saturate(170%);border:1px solid rgba(255,255,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.pilltag{background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+@supports not ((backdrop-filter:blur(4px)) or (-webkit-backdrop-filter:blur(4px))){
+  .nav,.card,.cf-slide,.price-card,form,.tool,.mini3d,.desk,.reel-frame{background:#1b1b2c!important}
+  .glass-blob,.glass-chip,.glass-ring{display:none}
+}
+@media(max-width:760px){
+  .nav,.card,.cf-slide,.price-card,form,.tool,.mini3d{ -webkit-backdrop-filter:blur(9px) saturate(150%);backdrop-filter:blur(9px) saturate(150%)}
+  .glass-ring{width:190px;height:190px}
+  .gb1{width:82px;height:82px}.gb2{width:52px;height:52px}
+}
+
+
+/* ===== TRAVELLING EDITOR CHARACTER ===== */
+/* Docked to viewport gutters / bottom edge safe-zone only — never centred over copy.
+   Wide screens: sits mostly in the gutter outside the 1200px wrap.
+   Narrow/mobile: smaller + partially peeking from the edge so it can't cover body text. */
+#charCompanion{position:fixed;left:0;top:0;width:138px;height:175px;z-index:285;pointer-events:none;will-change:transform;filter:drop-shadow(0 14px 22px rgba(0,0,0,.5))}
+#charCompanion canvas{width:100%;height:100%;display:block;pointer-events:none}
+#charCompanion .char-fallback{display:none;width:78%;height:78%;margin:8% auto 0}
+#charCompanion.nogl canvas{display:none}
+#charCompanion.nogl .char-fallback{display:block;animation:charBob 2.4s ease-in-out infinite}
+@keyframes charBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.char-tag{position:absolute;left:50%;top:-9px;bottom:auto;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.12em;color:var(--lime);background:rgba(8,8,16,.62);border:1px solid rgba(198,255,58,.4);padding:3px 9px;border-radius:99px;white-space:nowrap;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:opacity .35s;pointer-events:none}
+@media(max-width:760px){#charCompanion{width:84px;height:107px}.char-tag{font-size:.44rem;top:-7px;padding:2px 7px}}
+@media(max-height:480px){#charCompanion{display:none}}
+/* ===== ORBIT INFO CHIP (liquid glass) ===== */
+#orbitChip{position:absolute;left:50%;bottom:14px;transform:translate(-50%,14px);z-index:5;min-width:min(320px,86%);text-align:center;padding:10px 18px 9px;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 14px 30px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
+#orbitChip.show{opacity:1;transform:translate(-50%,0)}
+#orbitChip b{display:block;font-family:'Unbounded',sans-serif;font-size:.86rem;color:#fff}
+#orbitChip span{display:block;font-size:.8rem;color:rgba(255,255,255,.85);font-weight:700}
+#orbitChip small{display:block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin-top:2px}
+#glOrbit{cursor:pointer}
+
+/* ===== RESPONSIVE FIXES: COMPACT MOBILE NAV, HERO TYPE, BIG INTERACTIVE CHARACTER ===== */
+section[id]{scroll-margin-top:92px}
+.btn{min-height:48px}
+.fbtn{min-height:44px}
+#charCompanion{width:224px;height:284px;pointer-events:none;cursor:pointer;transform-origin:50% 100%}
+#charBubble{position:absolute;bottom:calc(100% + 14px);left:50%;transform:translate(-50%,10px) scale(.92);width:max-content;max-width:min(232px,66vw);padding:11px 15px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.26),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 16px 34px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);color:#fff;font-weight:700;font-size:.85rem;line-height:1.4;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:6}
+#charBubble.show{opacity:1;transform:translate(-50%,0) scale(1)}
+#charBubble::after{content:"";position:absolute;left:50%;bottom:-7px;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);background:rgba(30,30,48,.88);border-right:1px solid rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.5)}
+#charBubble.bub-l{left:-2px;transform:translate(0,10px) scale(.92)}
+#charBubble.bub-l.show{transform:translate(0,0) scale(1)}
+#charBubble.bub-l::after{left:36px}
+#charBubble.bub-r{left:auto;right:-2px;transform:translate(0,10px) scale(.92)}
+#charBubble.bub-r.show{transform:translate(0,0) scale(1)}
+#charBubble.bub-r::after{left:auto;right:36px;transform:rotate(45deg)}
+#charBubble.bub-below{bottom:auto;top:calc(100% + 14px);transform:translate(-50%,-10px) scale(.92)}
+#charBubble.bub-below.show{transform:translate(-50%,0) scale(1)}
+#charBubble.bub-below::after{bottom:auto;top:-7px;border-right:0;border-bottom:0;border-left:1px solid rgba(255,255,255,.5);border-top:1px solid rgba(255,255,255,.5)}
+#charBubble.bub-below.bub-l{transform:translate(0,-10px) scale(.92)}
+#charBubble.bub-below.bub-l.show{transform:translate(0,0) scale(1)}
+#charBubble.bub-below.bub-r{transform:translate(0,-10px) scale(.92)}
+#charBubble.bub-below.bub-r.show{transform:translate(0,0) scale(1)}
+#charZzz{position:absolute;top:-14px;right:10px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.85rem;letter-spacing:.15em;color:var(--cyan);opacity:0;transition:opacity .5s;pointer-events:none;animation:zzzFloat 2.2s ease-in-out infinite}
+#charZzz.show{opacity:1}
+@keyframes zzzFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+@keyframes chLoopM{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media(max-width:820px){
+  header{top:8px}
+  .nav{border-radius:22px;flex-wrap:wrap;padding:8px 10px;gap:6px 10px}
+  .logo{font-size:.94rem}
+  .hire{margin-left:auto;padding:9px 16px;font-size:.84rem;min-height:40px}
+  .nav nav{order:3;flex-basis:100%;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;margin-left:0;padding:2px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .nav nav::-webkit-scrollbar{display:none}
+  .nav nav a{padding:10px 12px;font-size:.84rem;min-height:40px;display:inline-flex;align-items:center;flex:0 0 auto;white-space:nowrap}
+  .hero{padding-top:142px}
+  section[id]{scroll-margin-top:126px}
+  section{padding-top:64px}
+}
+@media(max-width:760px){#charCompanion{width:148px;height:188px}}
+@media(max-width:560px){
+  .hero h1{font-size:clamp(2.45rem,14.2vw,3.3rem);letter-spacing:.005em}
+  .hero h1 .hollow{-webkit-text-stroke:1.4px var(--text)}
+  .hero h1 .ch{animation-name:chLoopM}
+  .roleline{font-size:1.02rem;gap:8px;margin-top:16px}
+  .rolebox{min-width:0;padding:3px 12px;font-size:.86em}
+  .hero-cta{flex-direction:column;align-items:stretch}
+  .hero-cta .btn{justify-content:center;width:100%}
+  .kicker{font-size:.68rem;letter-spacing:.1em;padding:6px 12px}
+}
+
+/* ===== VIDEO GALLERY + LIGHTBOX (repeatable pattern: add a tile with data-video-* and it just works) ===== */
+#workGrid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+@media(min-width:900px){#workGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:599px){#workGrid{grid-template-columns:minmax(0,1fr)}}
+.work-card.video-tile{display:flex;flex-direction:column}
+.work-card.video-tile .thumb{display:block}
+.work-card.video-tile .body{flex:1 1 auto;display:flex;flex-direction:column;align-items:flex-start}
+.work-card.video-tile h3{font-size:1.02rem;line-height:1.35;margin:11px 0 6px}
+.work-card.video-tile p{font-size:.9rem}
+.work-card.portrait .thumb{aspect-ratio:4/5}
+.work-card.portrait .thumb img{object-position:50% 22%}
+.thumb-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:66px;height:66px;border-radius:50%;background:var(--lime);display:grid;place-items:center;color:#0b0b08;z-index:2;box-shadow:0 12px 28px rgba(0,0,0,.5);animation:thumbPulse 1.6s ease-in-out infinite}
+.thumb-play svg{width:25px;height:25px;margin-left:3px}
+.work-card:hover .thumb-play{transform:translate(-50%,-50%) scale(1.08)}
+#workLightbox,#thumbLightbox{position:fixed;inset:0;z-index:450;display:grid;place-items:center;padding:18px}
+#workLightbox[hidden],#thumbLightbox[hidden]{display:none}
+.lb-backdrop{position:absolute;inset:0;background:rgba(3,3,9,.84);-webkit-backdrop-filter:blur(12px) saturate(140%);backdrop-filter:blur(12px) saturate(140%)}
+.lb-panel{position:relative;z-index:1;width:min(430px,94vw);padding:14px;border-radius:22px;background:linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 26px 60px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%)}
+.lb-panel.landscape{width:min(960px,94vw)}
+.lb-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}
+.lb-top b{font-family:'Unbounded',sans-serif;font-size:.8rem;letter-spacing:.02em}
+.lb-close{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.14);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;line-height:1}
+.lb-close:hover{background:var(--lime);color:#0b0b08;border-color:var(--lime)}
+#workLightboxVideo{display:block;height:min(76vh,150vw);width:auto;max-width:100%;aspect-ratio:9/16;margin:0 auto;border-radius:14px;background:#000;border:1px solid rgba(255,255,255,.25);object-fit:contain}
+#workLightboxVideo.landscape{width:100%;height:auto;aspect-ratio:16/9;max-height:82vh}
+.lb-caption{margin:11px 2px 0;text-align:center;color:rgba(255,255,255,.88);font-size:.85rem;font-weight:700}
+.lb-caption .lb-meta{display:block;color:var(--lime);font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+@media(max-width:560px){#workLightbox,#thumbLightbox{padding:12px}.lb-panel{padding:11px}#workLightboxVideo{height:min(72vh,150vw)}#workLightboxVideo.landscape{height:auto;max-height:82vh}}
+
+@media (prefers-reduced-motion: reduce){
+  /* Animations stay ON by design: this portfolio's motion is the content.
+     Only smooth scrolling is calmed for reduced-motion users. */
+  html{scroll-behavior:auto}
+  .glass-chip{filter:none}
+}
+
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="liquidWobble"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="n"><animate attributeName="baseFrequency" dur="9s" values="0.012 0.02;0.02 0.012;0.012 0.02" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="5"/></filter></defs></svg>
+<div id="progress"></div>
+<div id="curDot" aria-hidden="true"></div>
+<div id="curRing" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div id="loader" aria-hidden="true">
+  <div class="lname"><span style="--i:0">Y</span><span style="--i:1">A</span><span style="--i:2">S</span><span style="--i:3">H</span><span style="--i:4" class="lime">.</span></div>
+  <div class="lbar"><i></i></div>
+  <p>Loading 3D Edit World</p>
+</div>
+
+<canvas id="starCanvas" aria-hidden="true"></canvas>
+<div class="bgfx" aria-hidden="true"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div id="charCompanion" aria-hidden="true">
+  <div class="char-fallback" id="charFallback">
+    <svg viewBox="0 0 120 140" width="100%" height="100%" role="img" aria-label="Editor character sticker"><circle cx="60" cy="42" r="26" fill="#ffcf9e"/><path d="M34 40a26 26 0 0 1 52 0l0-8a26 20 0 0 0-52 0z" fill="#8b5cf6"/><rect x="28" y="34" width="10" height="20" rx="5" fill="#3ae0ff"/><rect x="82" y="34" width="10" height="20" rx="5" fill="#3ae0ff"/><circle cx="51" cy="42" r="3.4" fill="#111"/><circle cx="69" cy="42" r="3.4" fill="#111"/><path d="M50 54q10 8 20 0" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="38" y="72" width="44" height="38" rx="10" fill="#c6ff3a"/><polygon points="56,82 56,100 72,91" fill="#111"/><rect x="24" y="76" width="10" height="26" rx="5" fill="#ffcf9e"/><rect x="86" y="66" width="10" height="26" rx="5" fill="#ffcf9e"/></svg>
+  </div>
+  <canvas id="glChar"></canvas>
+  <div id="charBubble" role="status"></div>
+  <span id="charZzz" aria-hidden="true">Z z</span>
+  <span class="char-tag" id="charLabel">EDIT BUDDY &middot; SAYS HELLO</span>
+</div>
+
+<header>
+  <div class="wrap">
+    <div class="nav">
+      <a class="logo" href="#top">YASH<em>.KUMAR</em><span class="dot3d"></span></a>
+      <nav aria-label="Main">
+        <a href="#about">About</a><a href="#services">What I Do</a><a href="#work">Work</a><a href="#thumbnails">Thumbnails</a><a href="#career">Career</a><a href="#stack">Tech Stack</a>
+      </nav>
+      <a class="btn hire" href="#contact">Hire Me</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<!-- ================= HERO / LANDING ================= -->
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <span class="kicker"><i></i> HYPER — Professional Editor</span>
+        <h1 class="name3d" aria-label="Yash Kumar">
+          <span class="name-row" aria-hidden="true"><span class="ch3d" style="--i:0"><span class="ch-face">Y</span></span><span class="ch3d" style="--i:1"><span class="ch-face">A</span></span><span class="ch3d" style="--i:2"><span class="ch-face">S</span></span><span class="ch3d" style="--i:3"><span class="ch-face">H</span></span></span>
+          <span class="name-row row2" aria-hidden="true"><span class="ch3d hollow" style="--i:4"><span class="ch-face">K</span></span><span class="ch3d hollow" style="--i:5"><span class="ch-face">U</span></span><span class="ch3d hollow" style="--i:6"><span class="ch-face">M</span></span><span class="ch3d hollow" style="--i:7"><span class="ch-face">A</span></span><span class="ch3d hollow" style="--i:8"><span class="ch-face">R</span></span></span>
+        </h1>
+        <p class="roleline">Professional <span class="rolebox"><span id="roleWord">Video Editor</span></span></p>
+        <p style="margin:8px 0 0;font-weight:700;color:var(--muted)">Thumbnails &nbsp;·&nbsp; Motion Graphics &nbsp;·&nbsp; Reels Expert</p>
+        <p class="hero-intro">Hi, I'm Yash — a skilled and creative video editor. I turn raw footage into scroll-stopping reels, YouTube videos and motion graphics: clean cuts, punchy pacing, captions that pop and colour that glows. I edit in all languages.</p>
+        <div class="hero-cta">
+          <a class="btn" href="#reel">▶ Watch Showreel</a>
+          <a class="btn ghost" href="#work">Explore Work ↓</a>
+          <a class="btn violet" href="#pricing">Edits from ₹200</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat" style="--i:0"><b>4K</b><span>Ultra HD Delivery</span></div>
+          <div class="stat" style="--i:1"><b>₹200</b><span>Edits Start At</span></div>
+          <div class="stat" style="--i:2"><b>14+</b><span>Edit Styles</span></div>
+          <div class="stat" style="--i:3"><b>All</b><span>Languages</span></div>
+        </div>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="css-fallback" aria-hidden="true"><div class="disc"></div></div>
+        <canvas id="gl" aria-label="Interactive 3D scene of a video editor world — glowing play button, film frames and timeline orbiting in space"></canvas>
+        <div class="glass-ring" aria-hidden="true"></div><div class="glass-blob gb1" aria-hidden="true"></div><div class="glass-blob gb2" aria-hidden="true"></div><span class="glass-chip" aria-hidden="true">LIQUID GLASS · LIVE 3D</span>
+        <span class="hud tl"><span class="rec"></span>REC · 3D_SCENE_01</span>
+        <span class="hud tr">LIVE RENDER</span>
+        <span class="hud bl">Move mouse — scene reacts</span>
+        <span class="hud br">Three.js · 60 FPS</span>
+      </div>
+    </div>
+    <p class="scroll-hint" aria-hidden="true">Scroll ↓</p>
+  </div>
+</div>
+
+<div class="marquee limebar" aria-hidden="true"><div class="track" data-dup>
+  <span>Video Editing <b>✦</b></span><span>Reels &amp; Shorts <b>✦</b></span><span>Motion Graphics <b>✦</b></span><span>4K Ultra HD <b>✦</b></span><span>Thumbnails <b>✦</b></span><span>Logo Animation <b>✦</b></span><span>AI Video <b>✦</b></span><span>HYPER Edit <b>✦</b></span>
+</div></div>
+<div class="marquee rev" aria-hidden="true"><div class="track" data-dup>
+  <span>Premiere Pro <b>◆</b></span><span>After Effects <b>◆</b></span><span>CapCut <b>◆</b></span><span>Alight Motion <b>◆</b></span><span>Canva <b>◆</b></span><span>n8n Automation <b>◆</b></span><span>We Grow Together <b>◆</b></span><span>Truth in Content <b>◆</b></span>
+</div></div>
+
+<!-- ================= ABOUT ================= -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">01 — About</span>
+      <h2>Editor with a <span class="grad">CS Brain</span></h2>
+    </div>
+    <div class="about-grid">
+      <div class="card reveal about-main"><div class="lifey" style="--d:0s">
+        <p class="big">Career Objective</p>
+        <p>"A motivated Computer Science student with hands-on experience in AI automation, workflow design, and video editing. Seeking an opportunity in a growth-oriented company where I can apply my technical and creative skills while continuously learning new technologies."</p>
+        <p>That's the mindset behind HYPER: every edit is engineered — hook in the first second, rhythm in every cut, and a finish that makes people rewatch. I edit for creators and brands while pursuing my B.Tech in Computer Science.</p>
+        <div class="chips">
+          <span style="--i:1">All Languages</span>
+          <span style="--i:3">Freelance — Open for Work</span>
+        </div>
+      </div></div>
+      <div class="card reveal"><div class="lifey" style="--d:.4s">
+        <h3 style="font-family:'Unbounded';font-size:.95rem;text-transform:uppercase;margin-bottom:8px">Strengths</h3>
+        <div class="strength"><span class="sic" style="--i:0"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L9.5 22 19 10h-6.5z"/></svg></span><div><b>Quick Learner</b><span>New tools, new trends — picked up fast and applied faster.</span></div></div>
+        <div class="strength"><span class="sic" style="--i:1"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6M11 8v6"/></svg></span><div><b>Problem-Solving</b><span>Bad audio, shaky footage, missing hook — there's always a fix in the timeline.</span></div></div>
+        <div class="strength"><span class="sic" style="--i:2"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></span><div><b>Creative + Technical</b><span>An editor's eye with a programmer's structure — creativity that ships on time.</span></div></div>
+        <div class="strength"><span class="sic" style="--i:3"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/><path d="M8.5 11h7M8.5 14h4"/></svg></span><div><b>Communication &amp; Teamwork</b><span>Clear updates, honest timelines, revisions without drama.</span></div></div>
+      </div></div>
+    </div>
+    <div class="mini3d about-3d reveal"><canvas id="glReel" aria-label="Live 3D film reel rotating"></canvas><span class="hud tl">FILM_REEL_3D</span><span class="hud tr">LIVE RENDER</span></div>
+  </div>
+</section>
+
+<!-- ================= WHAT I DO ================= -->
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">02 — What I Do</span>
+      <h2>Everything your <span class="grad">Content Needs</span></h2>
+      <p>For YouTubers, Instagram Creators, Startups &amp; Fitness Influencers. All videos delivered in <strong style="color:var(--lime)">4K Ultra HD Quality</strong>.</p>
+    </div>
+    <div class="mini3d svc-3d reveal"><canvas id="glSvc" aria-label="Live 3D shapes for services — hover to speed up"></canvas><span class="hud tl">SERVICE_SHAPES_3D</span><span class="hud tr">HOVER = TURBO</span></div>
+    <div class="grid" id="serviceGrid"></div>
+  </div>
+</section>
+
+<!-- ================= EDITOR DESK ================= -->
+<section id="desk">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Inside the Edit Bay</span>
+      <h2>Timeline <span class="grad">Never Sleeps</span></h2>
+      <p>The playhead loops, the timecode ticks, the bars keep levelling up — exactly like a real edit session that never ends.</p>
+    </div>
+    <div class="desk reveal">
+      <div class="desk-top">
+        <div style="display:flex;align-items:center;gap:13px"><span class="win" aria-hidden="true"><i></i><i></i><i></i></span><span class="desk-name">HYPER_CUT_v3.prproj — Timeline</span></div>
+        <span id="timecode" aria-label="Looping timeline timecode">00:00:00:00</span>
+      </div>
+      <div class="timeline" aria-hidden="true">
+        <div class="ruler"><span>00:00</span><span>00:02</span><span>00:04</span><span>00:06</span><span>00:08</span><span>00:11</span></div>
+        <div id="playhead"></div>
+        <div class="trow">
+          <div class="clip" style="width:19%;background:#3ae0ff"><small>V2 · MOTION GFX</small></div>
+          <div class="clip" style="width:13%;background:#c6ff3a"><small>LOGO</small></div>
+          <div class="clip" style="width:24%;background:#ff4d7e"><small>V2 · ZOOM FX</small></div>
+          <div class="clip" style="width:16%;background:#febc2e"><small>TEXT POP</small></div>
+          <div class="clip" style="width:22%;background:#8b5cf6"><small style="color:#fff">V2 · OUTRO</small></div>
+        </div>
+        <div class="trow">
+          <div class="clip" style="width:27%;background:#ff4d7e"><small>V1 · A-ROLL</small></div>
+          <div class="clip" style="width:18%;background:#3ae0ff"><small>V1 · B-ROLL</small></div>
+          <div class="clip" style="width:21%;background:#c6ff3a"><small>V1 · REEL CUT</small></div>
+          <div class="clip" style="width:28%;background:#febc2e"><small>V1 · FINAL</small></div>
+        </div>
+        <div class="trow">
+          <div class="clip" style="width:36%;background:#4fc3ff"><small>A1 · VOICE + BEAT</small></div>
+          <div class="clip" style="width:26%;background:#ff9f2e"><small>A2 · SFX WHIP</small></div>
+          <div class="clip" style="width:32%;background:#b78bff"><small>A1 · MUSIC BED</small></div>
+        </div>
+      </div>
+      <div class="bars" role="list" aria-label="Core tool skill levels">
+        <div class="bar-row" role="listitem"><label>Adobe Premiere Pro <span class="tag">Primary</span></label><div class="bar"><i style="--lvl:95%;--dur:5.2s;--bd:0s;background:linear-gradient(90deg,#8b5cf6,#3ae0ff)"></i></div><span class="bar-pct">95%</span></div>
+        <div class="bar-row" role="listitem"><label>After Effects</label><div class="bar"><i style="--lvl:90%;--dur:5.9s;--bd:-1.7s;background:linear-gradient(90deg,#ff4d7e,#8b5cf6)"></i></div><span class="bar-pct">90%</span></div>
+        <div class="bar-row" role="listitem"><label>CapCut</label><div class="bar"><i style="--lvl:92%;--dur:5.5s;--bd:-3.1s;background:linear-gradient(90deg,#3ae0ff,#c6ff3a)"></i></div><span class="bar-pct">92%</span></div>
+        <div class="bar-row" role="listitem"><label>Alight Motion</label><div class="bar"><i style="--lvl:88%;--dur:6.3s;--bd:-.9s;background:linear-gradient(90deg,#febc2e,#ff4d7e)"></i></div><span class="bar-pct">88%</span></div>
+        <div class="bar-row" role="listitem"><label>Canva Design</label><div class="bar"><i style="--lvl:90%;--dur:5.7s;--bd:-2.3s;background:linear-gradient(90deg,#c6ff3a,#febc2e)"></i></div><span class="bar-pct">90%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WORK ================= -->
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">03 — Work</span>
+      <h2>Selected <span class="grad">Work</span></h2>
+      <p>Twenty-four real edits — tap any tile to play.</p>
+    </div>
+
+    <div id="reel" class="reel-frame reveal">
+      <div class="player">
+        <video id="reelVideo" src="assets/showreel.mp4" poster="assets/poster.jpg" preload="none" playsinline controls></video>
+        <span class="dur">0:11</span>
+        <button class="play-overlay" id="playOverlay" aria-label="Play showreel video">
+          <span class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+        </button>
+      </div>
+      <div class="reel-meta">
+        <h3>Insurance Journey — Motion Graphics Explainer</h3>
+        <span class="pilltag lime">Real Project</span><span class="pilltag">Motion Graphics</span><span class="pilltag">AI Voice Bot Promo</span><span class="pilltag">1280 × 720</span>
+      </div>
+    </div>
+
+    <div class="filterbar reveal" role="group" aria-label="Filter work" style="margin-top:30px">
+      <button class="fbtn on" data-filter="all">All</button>
+      <button class="fbtn" data-filter="motion">Motion Graphics</button>
+      <button class="fbtn" data-filter="reels">Reels &amp; Shorts</button>
+      <button class="fbtn" data-filter="youtube">YouTube</button>
+    </div>
+    <div class="work-3d-wrap"><canvas id="glWork" aria-hidden="true"></canvas>
+    <div class="grid" id="workGrid">
+      <button class="card work-card video-tile reveal" data-cat="youtube" id="workOnAirTile" data-video-src="assets/work-onair-podcast.mp4" data-video-poster="assets/work-onair-poster.jpg" data-video-title="On Air — Podcast Interview Edit" data-video-orient="landscape" data-video-caption="Podcast interview edit — 'On Air' show with guest Alakananda Agarwal" data-video-meta="1:21 · YouTube · Sound on" aria-label="Play On Air podcast interview edit, 1 minute 21 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-onair-poster.jpg" alt="Guest Alakananda Agarwal introduced in a purple split name-card, content creator and friend, On Air podcast edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">1:21</span></span>
+        <span class="body"><span class="pilltag lime">YouTube · Podcast Edit</span><h3>On Air — Podcast Interview Edit</h3><p>Long-form podcast interview edit — two hosts in conversation with content creator Alakananda Agarwal, with sticker cutout animations, kinetic captions, B-roll overlays and a neon “On Air” end card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile reveal" data-cat="youtube" id="workDistributionTile" data-video-src="assets/work-hyper-distribution.mp4" data-video-poster="assets/work-distribution-poster.jpg" data-video-title="Content Distribution — HYPER Explainer Edit" data-video-orient="landscape" data-video-caption="HYPER explainer edit — content distribution strategy" data-video-meta="0:49 · YouTube · Sound on" aria-label="Play Content Distribution HYPER explainer edit, 49 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-distribution-poster.jpg" alt="Speaker in front of big green DISTRIBUTION strategy kinetic typography, HYPER edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:49</span></span>
+        <span class="body"><span class="pilltag lime">YouTube · HYPER Edit</span><h3>Content Distribution — HYPER Explainer Edit</h3><p>Landscape explainer on content distribution strategy, with kinetic typography, motion graphics, diagrams and captions. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile reveal" data-cat="motion" id="workReelTile" aria-label="Play the Insurance Journey showreel">
+        <span class="thumb"><img src="assets/poster.jpg" alt="Frame from the Insurance Journey motion graphics explainer video" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:11</span></span>
+        <span class="body"><span class="pilltag lime">Motion Graphics · Real</span><h3>Insurance Journey — Explainer</h3><p>11-second golden-dark explainer with animated journey graphics. Tap to play the showreel above ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workZolieTile" data-video-src="assets/work-zolie-skin.mp4" data-video-poster="assets/work-zolie-poster.jpg" data-video-title="Zolie Skin Clinic — Laser Promo Edit" data-video-orient="portrait" data-video-caption="Promotional ad edit — laser hair reduction promo for Zolie Skin Clinic" data-video-meta="0:30 · Reels &amp; Shorts · Sound on" aria-label="Play Zolie Skin Clinic laser promo edit, 30 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-zolie-poster.jpg" alt="Clinic reception desk under a gold ZOLIE SKIN CLINIC wall logo, laser promo edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:30</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Promo Edit</span><h3>Zolie Skin Clinic — Laser Promo Edit</h3><p>Promotional ad edit for Zolie Skin Clinic — waxing and shaving pain-point opening, kinetic text overlays, ₹99 session offer cards and clinic reception footage, ending on the logo end card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workRealEstateTile" data-video-src="assets/work-realestate-promo.mp4" data-video-poster="assets/work-realestate-poster.jpg" data-video-title="Real Estate — Agent Promo Edit" data-video-orient="portrait" data-video-caption="Promotional reel edit — real-estate agent promo with kinetic word animations and AR-style overlays" data-video-meta="0:15 · Reels &amp; Shorts · Sound on" aria-label="Play Real Estate agent promo edit, 15 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-realestate-poster.jpg" alt="Presenter in a modern kitchen with a 3D house model on the counter and Video, 3D Tours and Photo overlay labels, real-estate promo edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:15</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Promo Edit</span><h3>Real Estate — Agent Promo Edit</h3><p>Promotional agent reel — presenter in a modern kitchen with bold kinetic word animations, AR-style Photo / Video / 3D Tours labels, a 3D house model and a floor-plan graphic on the counter. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workSalaryTile" data-video-src="assets/work-salary-worth.mp4" data-video-poster="assets/work-salary-poster.jpg" data-video-title="Your Salary Is Not Your Worth — Business Explainer Edit" data-video-orient="portrait" data-video-caption="Business explainer edit — 'Your salary is not what you're worth': night-rooftop presenter with kinetic typography, Feel Tired / Capped / Stuck pills, Skill vs Drive cards, office cutaways, the story of Alex closing a $6,000 client, and a LINK end card, with MADE BY HYPER branding" data-video-meta="0:55 · Reels &amp; Shorts · Sound on" aria-label="Play Your Salary Is Not Your Worth business explainer edit, 55 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-salary-poster.jpg" alt="Presenter on a night rooftop gesturing toward the camera under YOUR SALARY IS NOT typography with a MADE BY HYPER mark, business explainer edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:55</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Explainer Edit</span><h3>Your Salary Is Not Your Worth — Business Explainer Edit</h3><p>Business coaching reel — “Your salary is not what you're worth” — a night-rooftop presenter with heavy kinetic typography, Feel Tired / Capped / Stuck pills, Skill vs Drive cards, office cutaways, the story of Alex closing a $6,000 client, and a LINK end card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workSecularInspectorTile" data-video-src="assets/work-secular-inspector.mp4" data-video-poster="assets/work-secular-inspector-poster.jpg" data-video-title="Secular Inspector — Political Commentary Edit" data-video-orient="portrait" data-video-caption="Political commentary edit — presenter in a POLICE cap at a studio mic introducing himself as the Secular Inspector, with subject info cards, bold typography cards, a Mahabharat chariot illustration, animated India/Bangladesh maps, protest photo collages, a tweet screenshot card, party-logo graphics, split-screen presenter/layout combos and a HYPER outro" data-video-meta="1:02 · Reels &amp; Shorts · Sound on" aria-label="Play Secular Inspector political commentary edit, 1 minute 2 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-secular-inspector-poster.jpg" alt="Presenter in a POLICE cap speaking into a studio microphone with a SECULAR INSPECTOR subtitle, political commentary edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">1:02</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Explainer Edit</span><h3>Secular Inspector — Political Commentary Edit</h3><p>Commentary explainer edit — a presenter in a POLICE cap at a studio mic, introducing himself as the Secular Inspector, with dense motion graphics: subject info cards, bold typography cards, a Mahabharat chariot illustration, animated India/Bangladesh maps, protest photo collages, a tweet screenshot card, party-logo graphics and split-screen layouts, ending on a HYPER outro. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workTradingTile" data-video-src="assets/work-trading-explainer.mp4" data-video-poster="assets/work-trading-poster.jpg" data-video-title="Intra Day vs Swing — Trading Explainer Edit" data-video-orient="portrait" data-video-caption="Finance explainer edit — intra day vs swing trading, with bold animated keyword overlays" data-video-meta="1:02 · Reels &amp; Shorts · Sound on" aria-label="Play Intra Day vs Swing trading explainer edit, 1 minute 2 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-trading-poster.jpg" alt="Presenter with glasses gesturing in front of a multi-monitor stock-chart wall, trading explainer edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">1:02</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Explainer Edit</span><h3>Intra Day vs Swing — Trading Explainer Edit</h3><p>Finance education reel — a presenter explaining intra day vs swing trading, with bold animated keyword overlays, calendar graphics, phone chart cutaways and a comment end card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workTradingInvestmentTile" data-video-src="assets/work-trading-investment.mp4" data-video-poster="assets/work-trading-investment-poster.jpg" data-video-title="Trading vs Investment — Finance Explainer Edit" data-video-orient="portrait" data-video-caption="Finance explainer edit — trading vs investment, with animated ₹500 note graphics, falling-arrow charts, a discipline / strategy / risk list, piggy-bank growth graphics and a wealth-tree graphic" data-video-meta="1:10 · Reels &amp; Shorts · Sound on" aria-label="Play Trading vs Investment finance explainer edit, 1 minute 10 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-trading-investment-poster.jpg" alt="Presenter with glasses with a fan of ₹500 notes spread behind his head, trading vs investment finance explainer edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">1:10</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Explainer Edit</span><h3>Trading vs Investment — Finance Explainer Edit</h3><p>Finance education reel — the same presenter asking trading vs investment: which makes more money? With glass Trading / Investment labels, a fan of ₹500 notes, red falling-arrow charts, a Discipline / Strategy / Risk Management list, piggy-bank growth graphics, compounding phone cutaways and a wealth-tree graphic. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workTradingMistakesTile" data-video-src="assets/work-trading-mistakes.mp4" data-video-poster="assets/work-trading-mistakes-poster.jpg" data-video-title="3 Trading Mistakes — Finance Explainer Edit" data-video-orient="portrait" data-video-caption="Finance explainer edit — 3 trading mistakes: revenge trading, shifting your stop-loss, and trading without a setup, with animated strategy, LOSS/PROFIT, numbered-diamond and piggy-bank graphics" data-video-meta="1:09 · Reels &amp; Shorts · Sound on" aria-label="Play 3 Trading Mistakes finance explainer edit, 1 minute 9 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-trading-mistakes-poster.jpg" alt="Presenter with glasses in front of a big pink piggy-bank with green rising arrows and +63% graphics, 3 trading mistakes finance explainer edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">1:09</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Explainer Edit</span><h3>3 Trading Mistakes — Finance Explainer Edit</h3><p>Finance education reel — the same presenter on the 3 trading mistakes that cost traders: revenge trading, shifting your stop-loss, and trading without a setup. With a chess-piece Strategy graphic, LOSS/PROFIT toggle pills, purple numbered diamonds 1-2-3, a stressed-trader cutaway, a Mr Bean waiting meme, piggy-bank growth graphics with rising % counters, phone portfolio cutaways and a SUBSCRIBE end card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="motion" id="workBooksTile" data-video-src="assets/work-books-explainer.mp4" data-video-poster="assets/work-books-poster.jpg" data-video-title="Why Read Books — Kinetic Explainer Edit" data-video-orient="portrait" data-video-caption="Kinetic explainer edit — why should we read books?" data-video-meta="0:23 · Motion Graphics · Sound on" aria-label="Play Why Read Books kinetic explainer edit, 23 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-books-poster.jpg" alt="Girl and her dog sailing a red paper boat through a photo-filled room under it's kind of emotions kinetic typography, books explainer edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:23</span></span>
+        <span class="body"><span class="pilltag lime">Motion Graphics · Explainer</span><h3>Why Read Books — Kinetic Explainer Edit</h3><p>Kinetic-typography explainer — “Why should we read books?” — paper-craft illustrations, an open book, a crumpled-paper brain, an hours counter, and a girl with her dog sailing a red paper boat, ending on a purple HYPER card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="motion" id="workMotionTile" data-video-src="assets/work-motion-design.mp4" data-video-poster="assets/work-motion-poster.jpg" data-video-title="Motion Design — Kinetic Type Edit" data-video-orient="portrait" data-video-caption="Motion-design showcase — kinetic typography rising out of an editing timeline" data-video-meta="0:15 · Motion Graphics · Sound on" aria-label="Play Motion Design kinetic type edit, 15 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-motion-poster.jpg" alt="Its motion Design kinetic typography with a big eye graphic and green leaves rising out of an editing timeline" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:15</span></span>
+        <span class="body"><span class="pilltag lime">Motion Graphics · Showcase</span><h3>Motion Design — Kinetic Type Edit</h3><p>Motion-design explainer reel — “Ever Wonder?… It’s not magic, it’s Motion Design” — kinetic typography, visual metaphors and emotion faces, ending on a purple HYPER card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="motion" id="workConsistencyTile" data-video-src="assets/work-consistency-breakdown.mp4" data-video-poster="assets/work-consistency-poster.jpg" data-video-title="Consistency — Editing Breakdown Edit" data-video-orient="portrait" data-video-caption="Split-screen editing breakdown — the finished motivational motion-design piece plays on top while its Alight Motion timeline with layered groups plays in sync below" data-video-meta="0:16 · Motion Graphics · Sound on" aria-label="Play Consistency editing breakdown edit, 16 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-consistency-poster.jpg" alt="Crowned gold skull under Consistency isn't EXISTING typography above an Alight Motion timeline with coloured layer bars, editing breakdown edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:16</span></span>
+        <span class="body"><span class="pilltag lime">Motion Graphics · Editing Breakdown</span><h3>Consistency — Editing Breakdown Edit</h3><p>Split-screen editing breakdown — the finished “Consistency isn't existing, it's exhausting…” motion-design piece plays on top while its Alight Motion timeline, with Group and text layers in coloured bars, plays in sync below. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="motion" id="workWonderTile" data-video-src="assets/work-wonder-lyric.mp4" data-video-poster="assets/work-wonder-poster.jpg" data-video-title="I Wonder — Lyric Typography Edit" data-video-orient="portrait" data-video-caption="Kinetic-typography lyric video — 'I Wonder' with blue chat-bubble lyrics, black-and-white portraits, Instagram-post mockups and a HYPER end card" data-video-meta="0:35 · Motion Graphics · Sound on" aria-label="Play I Wonder lyric typography edit, 35 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-wonder-poster.jpg" alt="Stacked blue chat bubbles reading When I will find the one with a gold heart outline, I Wonder lyric typography edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:35</span></span>
+        <span class="body"><span class="pilltag lime">Motion Graphics · Lyric Video</span><h3>I Wonder — Lyric Typography Edit</h3><p>Kinetic-typography lyric video — “I Wonder” — blue chat-bubble lyrics stacking over a gold heart outline, black-and-white portraits, Instagram-post mockups and a HYPER end card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workGeminiTile" data-video-src="assets/work-gemini-reel.mp4" data-video-poster="assets/work-gemini-poster.jpg" data-video-title="Gemini Omni — AI Video Editing Reel" data-video-orient="portrait" data-video-caption="Sample edit — vertical reel" data-video-meta="0:15 · Reels &amp; Shorts · Sound on" aria-label="Play Gemini Omni AI video editing reel, 15 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-gemini-poster.jpg" alt="Speaker presenting Google Gemini Omni in a vertical reel with bold animated captions" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:15</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Sample Edit</span><h3>Gemini Omni — AI Video Editing Reel</h3><p>Vertical talking-head reel on Google Gemini Omni, with bold animated captions, motion graphics and split-screen before/after shots. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workMustangTile" data-video-src="assets/work-mustang-hyper.mp4" data-video-poster="assets/work-mustang-poster.jpg" data-video-title="Mustang — HYPER VFX Car Edit" data-video-orient="portrait" data-video-caption="HYPER montage — cinematic VFX car edit" data-video-meta="0:18 · Reels &amp; Shorts · Sound on" aria-label="Play Mustang HYPER VFX car edit, 18 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-mustang-poster.jpg" alt="Blue Ford Mustang in side profile under a large HYPER title, cinematic VFX car edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:18</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · HYPER Edit</span><h3>Mustang — HYPER VFX Car Edit</h3><p>Cinematic VFX car montage — blue Mustang with HYPER title treatments, colour-shift and glitch transitions, and an exploding-parts assembly sequence. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workGtrTile" data-video-src="assets/work-gtr-hyper.mp4" data-video-poster="assets/work-gtr-poster.jpg" data-video-title="GT-R — HYPER Night Edit" data-video-orient="portrait" data-video-caption="HYPER montage — cinematic night car edit" data-video-meta="0:15 · Reels &amp; Shorts · Sound on" aria-label="Play GT-R HYPER night edit, 15 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-gtr-poster.jpg" alt="Blue Nissan GT-R front view at night with red and white HYPER EDITZ title, cinematic car edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:15</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · HYPER Edit</span><h3>GT-R — HYPER Night Edit</h3><p>Cinematic night car montage — blue Nissan GT-R in a parking structure, HYPER EDITZ title animation and slick match cuts through headlight, taillight and wheel close-ups. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workHuracanTile" data-video-src="assets/work-huracan-hyper.mp4" data-video-poster="assets/work-huracan-poster.jpg" data-video-title="Huracán — HYPER Glow Edit" data-video-orient="portrait" data-video-caption="HYPER montage — glowing night car edit" data-video-meta="0:14 · Reels &amp; Shorts · Sound on" aria-label="Play Huracán HYPER glow edit, 14 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-huracan-poster.jpg" alt="Lime-green Lamborghini Huracán at night with a glowing green aura and polaroid photo frames around it, HYPER edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:14</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · HYPER Edit</span><h3>Huracán — HYPER Glow Edit</h3><p>Glowing night car montage — lime-green Lamborghini Huracán with a neon aura and polaroid frame overlays, rear shots at a petrol station and a glowing HYPER end card. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workTysonTile" data-video-src="assets/work-tyson-hyper.mp4" data-video-poster="assets/work-tyson-poster.jpg" data-video-title="Mike Tyson — HYPER Fan Edit" data-video-orient="portrait" data-video-caption="HYPER fan edit — documentary-style edit cut from archival Tyson footage (fan edit, no official association)" data-video-meta="0:25 · Reels &amp; Shorts · Sound on" aria-label="Play Mike Tyson HYPER fan edit, 25 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-tyson-poster.jpg" alt="Mike Tyson wearing championship belts under A WORLD CHAMPION typography, rising out of an editing timeline, HYPER fan edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:25</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Fan Edit</span><h3>Mike Tyson — HYPER Fan Edit</h3><p>Documentary-style fan edit — “This is Mike Tyson, a world champion” — bold serif typography rising out of an editing timeline, archival fight footage and interview clips, ending on a purple HYPER card. Fan edit, no official association. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workVerstappenTile" data-video-src="assets/work-verstappen-hyper.mp4" data-video-poster="assets/work-verstappen-poster.jpg" data-video-title="Max Verstappen — HYPER Fan Edit" data-video-orient="portrait" data-video-caption="HYPER fan edit — F1 montage cut from broadcast race footage (fan edit, no official association)" data-video-meta="0:21 · Reels &amp; Shorts · Sound on" aria-label="Play Max Verstappen HYPER fan edit, 21 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-verstappen-poster.jpg" alt="Max Verstappen celebrating in his Red Bull race suit under a MAX Verstappen title card, Made by HYPER, black-and-white F1 fan edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:21</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Fan Edit</span><h3>Max Verstappen — HYPER Fan Edit</h3><p>F1 fan edit — black-and-white “MAX Verstappen / Made by HYPER” title card opening into a Red Bull Racing on-track montage with HYPER EDITZ branding. Fan edit, no official association. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workBillieTile" data-video-src="assets/work-billie-hyper.mp4" data-video-poster="assets/work-billie-poster.jpg" data-video-title="Billie Eilish — HYPER Fan Edit" data-video-orient="portrait" data-video-caption="HYPER fan edit — moody music edit cut from the 'Happier Than Ever' music-video footage, with single lyric words flashing on screen and a glowing HYPER lightning end card (fan edit, no official association)" data-video-meta="0:19 · Reels &amp; Shorts · Sound on" aria-label="Play Billie Eilish HYPER fan edit, 19 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-billie-poster.jpg" alt="Billie Eilish close-up with wet hair strands across her face in deep-blue light, under a NO lyric word and a MADE BY HYPER credit, HYPER fan edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:19</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Fan Edit</span><h3>Billie Eilish — HYPER Fan Edit</h3><p>Moody music fan edit — “Happier Than Ever” footage in deep-blue and black-and-white grading, single lyric words flashing on screen — NO, DON'T, LIE — wet-hair rain imagery and a glowing HYPER lightning end card. Fan edit, no official association. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workPeterGwenTile" data-video-src="assets/work-peter-gwen-hyper.mp4" data-video-poster="assets/work-peter-gwen-poster.jpg" data-video-title="Peter &amp; Gwen — HYPER Fan Edit" data-video-orient="portrait" data-video-caption="HYPER fan edit — romantic Peter Parker &amp; Gwen Stacy edit cut from The Amazing Spider-Man film footage, with glowing Hindi shayari-style typography, floating pink neon hearts and sparkle particles, ending on a HYPER MADE THAT card (fan edit, no official association)" data-video-meta="0:22 · Reels &amp; Shorts · Sound on" aria-label="Play Peter and Gwen HYPER fan edit, 22 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-peter-gwen-poster.jpg" alt="Peter Parker and Gwen Stacy face to face in profile under glowing pink SAMBHAL typography, HYPER fan edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:22</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Fan Edit</span><h3>Peter &amp; Gwen — HYPER Fan Edit</h3><p>Romantic fan edit — Peter Parker &amp; Gwen Stacy from The Amazing Spider-Man films, glowing Hindi shayari-style typography timed to the song, floating pink neon hearts and sparkle particles, ending on a “HYPER MADE THAT” card. Fan edit, no official association. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workPennywiseTile" data-video-src="assets/work-pennywise-hyper.mp4" data-video-poster="assets/work-pennywise-poster.jpg" data-video-title="Pennywise — HYPER Fan Edit" data-video-orient="portrait" data-video-caption="HYPER fan edit — meme edit cut from IT footage (fan edit, no official association)" data-video-meta="0:17 · Reels &amp; Shorts · Sound on" aria-label="Play Pennywise HYPER fan edit, 17 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-pennywise-poster.jpg" alt="Pennywise clown close-up under an EVERYONE SCARED OF PANNEWYISE title bar, HYPER fan edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:17</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Fan Edit</span><h3>Pennywise — HYPER Fan Edit</h3><p>Meme fan edit — “Everyone scared of Pennywise… Meanwhile: Richie” — fast velocity cuts through IT footage, ending on a lightning HYPER end card. Fan edit, no official association. Tap to play ▶</p></span>
+      </button>
+      <button class="card work-card video-tile portrait reveal" data-cat="reels" id="workPennywiseSmileTile" data-video-src="assets/work-pennywise-smile.mp4" data-video-poster="assets/work-pennywise-smile-poster.jpg" data-video-title="Pennywise Smile — HYPER Fan Edit" data-video-orient="portrait" data-video-caption="HYPER fan edit — late-night talk-show interview with Pennywise's actor doing the Pennywise smile, the clown face composited on his shirt, then a horror montage of IT footage ending on a glowing HYPER card (fan edit, no official association)" data-video-meta="0:36 · Reels &amp; Shorts · Sound on" aria-label="Play Pennywise Smile HYPER fan edit, 36 seconds" aria-haspopup="dialog">
+        <span class="thumb"><img src="assets/work-pennywise-smile-poster.jpg" alt="Actor smiling and pointing at the Pennywise clown face composited on his shirt during a talk-show interview, HYPER fan edit" loading="lazy" decoding="async"><span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="dur">0:36</span></span>
+        <span class="body"><span class="pilltag lime">Reels &amp; Shorts · Fan Edit</span><h3>Pennywise Smile — HYPER Fan Edit</h3><p>Fan edit — “there's something about that smile…” — a late-night talk-show interview with Pennywise's actor doing the smile, the clown face composited on his shirt, then a glowing horror montage of IT clips and a HYPER end card. Fan edit, no official association. Tap to play ▶</p></span>
+      </button>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THUMBNAILS ================= -->
+<section id="thumbnails">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Thumbnails</span>
+      <h2>Thumbnails</h2>
+      <p>Seven thumbnail designs — tap any thumbnail to view it full size. YouTube and Shorts thumbnails designed to get the click.</p>
+    </div>
+    <div class="grid" id="thumbGrid">
+      <button class="card thumb-card landscape reveal" id="thumbResidentEvil" data-thumb-src="assets/thumb-resident-evil.jpg" data-thumb-orientation="landscape" data-thumb-meta="YouTube Thumbnail · 1280 × 720" data-thumb-title="Resident Evil Requiem #2 — Gaming Thumbnail" data-thumb-caption="Gaming YouTube thumbnail — Resident Evil Requiem #2, red horror style with the creator and the game character." aria-label="View full size: Resident Evil Requiem number 2 gaming thumbnail" aria-haspopup="dialog">
+        <span class="thumb-img"><img src="assets/thumb-resident-evil.jpg" alt="Resident Evil Requiem number 2 gaming YouTube thumbnail — creator with headphones holding a pistol beside the blonde game character, red horror background" width="1280" height="720" loading="lazy" decoding="async"><span class="thumb-view" aria-hidden="true">⤢ View full size</span></span>
+        <span class="thumb-body"><span class="pilltag lime">YouTube Thumbnail</span><h3>Resident Evil Requiem #2 — Gaming Thumbnail</h3><p>Gaming thumbnail in a red horror style — Resident Evil Requiem #2.</p></span>
+      </button>
+      <button class="card thumb-card landscape reveal" id="thumbGtaMichael" data-thumb-src="assets/thumb-gta-michael.jpg" data-thumb-orientation="landscape" data-thumb-meta="YouTube Thumbnail · 1280 × 720" data-thumb-title="GTA V — Finally Michael Ko Bacha Leya" data-thumb-caption="GTA V YouTube thumbnail — Michael rescued, with gameplay stills and the creator holding a controller." aria-label="View full size: GTA V Finally Michael Ko Bacha Leya thumbnail" aria-haspopup="dialog">
+        <span class="thumb-img"><img src="assets/thumb-gta-michael.jpg" alt="GTA V YouTube thumbnail reading Finally Michael Ko Bacha Leya, with Michael gameplay stills and the creator holding a red controller" width="1280" height="720" loading="lazy" decoding="async"><span class="thumb-view" aria-hidden="true">⤢ View full size</span></span>
+        <span class="thumb-body"><span class="pilltag lime">YouTube Thumbnail</span><h3>GTA V — Finally Michael Ko Bacha Leya</h3><p>GTA V thumbnail — Michael rescued, with gameplay stills around the creator.</p></span>
+      </button>
+      <button class="card thumb-card landscape reveal" id="thumbGtaDafan" data-thumb-src="assets/thumb-gta-dafan.jpg" data-thumb-orientation="landscape" data-thumb-meta="YouTube Thumbnail · 1280 × 720" data-thumb-title="GTA V #4 — Kuch Sach Kabhi Dafan Nahi Hote" data-thumb-caption="GTA V number 4 YouTube thumbnail — snowy funeral scene with photo stills and the creator holding a controller." aria-label="View full size: GTA V number 4 Kuch Sach Kabhi Dafan Nahi Hote thumbnail" aria-haspopup="dialog">
+        <span class="thumb-img"><img src="assets/thumb-gta-dafan.jpg" alt="GTA V number 4 YouTube thumbnail reading Kuch Sach Kabhi Dafan Nahi Hote, snowy funeral scene with photo stills and the creator holding a red controller" width="1280" height="720" loading="lazy" decoding="async"><span class="thumb-view" aria-hidden="true">⤢ View full size</span></span>
+        <span class="thumb-body"><span class="pilltag lime">YouTube Thumbnail</span><h3>GTA V #4 — Kuch Sach Kabhi Dafan Nahi Hote</h3><p>GTA V #4 thumbnail — snowy funeral scene with photo stills.</p></span>
+      </button>
+      <button class="card thumb-card landscape reveal" id="thumbRoom206" data-thumb-src="assets/thumb-room206.jpg" data-thumb-orientation="landscape" data-thumb-meta="YouTube Thumbnail · 1280 × 720" data-thumb-title="Resident Evil Requiem — Room 206 Me Kya Hai?" data-thumb-caption="Gaming YouTube thumbnail — Resident Evil Requiem, Room 206 mystery with the zombie and the creator with a headset." aria-label="View full size: Resident Evil Requiem Room 206 Me Kya Hai thumbnail" aria-haspopup="dialog">
+        <span class="thumb-img"><img src="assets/thumb-room206.jpg" alt="Resident Evil Requiem YouTube thumbnail reading Room 206 Me Kya Hai, with a zombie, gameplay photo stills and the creator with a headset" width="1280" height="720" loading="lazy" decoding="async"><span class="thumb-view" aria-hidden="true">⤢ View full size</span></span>
+        <span class="thumb-body"><span class="pilltag lime">YouTube Thumbnail</span><h3>Resident Evil Requiem — Room 206 Me Kya Hai?</h3><p>Resident Evil Requiem thumbnail — the Room 206 mystery, zombie and creator.</p></span>
+      </button>
+      <button class="card thumb-card portrait reveal" id="thumbKidnap" data-thumb-src="assets/thumb-gta-kidnap.jpg" data-thumb-orientation="portrait" data-thumb-meta="YouTube Shorts Thumbnail · 720 × 1280" data-thumb-title="GTA V — Who Kidnapped Michael?" data-thumb-caption="GTA V Shorts thumbnail — Who kidnapped Michael, with Michael hanging upside down and the mystery man." aria-label="View full size: GTA V Who Kidnapped Michael Shorts thumbnail" aria-haspopup="dialog">
+        <span class="thumb-img"><img src="assets/thumb-gta-kidnap.jpg" alt="GTA V Shorts thumbnail reading Who Kidnap Michael, with Michael hanging upside down, a mystery man with a question mark face and the creator holding a red controller" width="720" height="1280" loading="lazy" decoding="async"><span class="thumb-view" aria-hidden="true">⤢ View full size</span></span>
+        <span class="thumb-body"><span class="pilltag lime">YouTube Shorts Thumbnail</span><h3>GTA V — Who Kidnapped Michael?</h3><p>GTA V Shorts thumbnail — Michael hanging upside down, mystery kidnapper.</p></span>
+      </button>
+      <button class="card thumb-card portrait reveal" id="thumbTrying" data-thumb-src="assets/thumb-gta-find-michael.jpg" data-thumb-orientation="portrait" data-thumb-meta="YouTube Shorts Thumbnail · 720 × 1280" data-thumb-title="GTA V — Trying Hard to Find Michael" data-thumb-caption="GTA V Shorts thumbnail — Trying hard to find Michael, with the cat-driving meme, dogs and the creator holding a controller." aria-label="View full size: GTA V Trying Hard to Find Michael Shorts thumbnail" aria-haspopup="dialog">
+        <span class="thumb-img"><img src="assets/thumb-gta-find-michael.jpg" alt="GTA V Shorts thumbnail reading Trying Hard to Find Michael, with a cat driving meme, a white car on the street and the creator holding a red controller" width="720" height="1280" loading="lazy" decoding="async"><span class="thumb-view" aria-hidden="true">⤢ View full size</span></span>
+        <span class="thumb-body"><span class="pilltag lime">YouTube Shorts Thumbnail</span><h3>GTA V — Trying Hard to Find Michael</h3><p>GTA V Shorts thumbnail — cat-driving meme and the search for Michael.</p></span>
+      </button>
+      <button class="card thumb-card landscape reveal" id="thumbFears" data-thumb-src="assets/thumb-fears-fathom.jpg" data-thumb-orientation="landscape" data-thumb-meta="YouTube Thumbnail · 1280 × 720" data-thumb-title="Fears to Fathom — Ironbark Lookout" data-thumb-caption="Horror YouTube thumbnail — Fears to Fathom Ironbark Lookout, with the watchtower, the hooded figure and the creator with a headset." aria-label="View full size: Fears to Fathom Ironbark Lookout thumbnail" aria-haspopup="dialog">
+        <span class="thumb-img"><img src="assets/thumb-fears-fathom.jpg" alt="Fears to Fathom Ironbark Lookout horror YouTube thumbnail, with a lit watchtower at night, a hooded figure and the creator with a headset" width="1280" height="720" loading="lazy" decoding="async"><span class="thumb-view" aria-hidden="true">⤢ View full size</span></span>
+        <span class="thumb-body"><span class="pilltag lime">YouTube Thumbnail</span><h3>Fears to Fathom — Ironbark Lookout</h3><p>Horror thumbnail — the Ironbark Lookout watchtower and the hooded figure.</p></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3D SHOWCASE ================= -->
+<section id="showcase">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">3D Showcase</span>
+      <h2>Slides in <span class="grad">Orbit</span></h2>
+      <p>A 3D coverflow that rotates on its own, forever. Drag it, swipe it, or use the buttons — it always keeps moving.</p>
+    </div>
+    <div class="cf-zone reveal">
+      <div class="cf-view" id="cfView" aria-label="3D showcase carousel">
+        <div class="cf-track" id="cfTrack">
+          <article class="cf-slide" data-name="Insurance Journey — Real Project">
+            <div class="simg"><img src="assets/poster.jpg" alt="Insurance Journey motion graphics explainer frame"></div>
+            <div class="sbody"><span class="pilltag lime">Real Project · 0:11</span><h3>Insurance Journey</h3><p>Motion graphics explainer with AI voice-bot promo — my actual showreel project.</p></div>
+          </article>
+          <article class="cf-slide" data-name="Reels & Shorts">
+            <div class="sic" style="background:linear-gradient(140deg,#ff4d7e,#8b5cf6)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 8.5l5 3.5-5 3.5z" fill="#fff" stroke="none"/></svg></div>
+            <div class="sbody"><span class="pilltag">Most Wanted</span><h3>Reels &amp; Shorts</h3><p>Hook-first Instagram edits — gym reels, memes and trendy shorts that get replayed.</p></div>
+          </article>
+          <article class="cf-slide" data-name="Motion Graphics">
+            <div class="sic" style="background:linear-gradient(140deg,#8b5cf6,#3ae0ff)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M3 17c5-9 8 3 12-6 2-4 4-5 6-5"/><circle cx="19" cy="7" r="2" fill="#c6ff3a" stroke="none"/></svg></div>
+            <div class="sbody"><span class="pilltag">After Effects</span><h3>Motion Graphics</h3><p>Animated text, logo animations and explainer graphics with real pop.</p></div>
+          </article>
+          <article class="cf-slide" data-name="Thumbnails & Posters">
+            <div class="sic" style="background:linear-gradient(140deg,#febc2e,#ff4d7e)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.7" fill="#fff" stroke="none"/><path d="M3 17l5.5-4 4 3 3.5-2.5L21 17"/></svg></div>
+            <div class="sbody"><span class="pilltag">Click Magnet</span><h3>Thumbnails &amp; Posters</h3><p>YouTube thumbnails, posters and banners designed to stop the scroll.</p></div>
+          </article>
+          <article class="cf-slide" data-name="Gaming & Finance Edits">
+            <div class="sic" style="background:linear-gradient(140deg,#3ae0ff,#c6ff3a)"><svg viewBox="0 0 24 24" fill="none" stroke="#0b0b08" stroke-width="2"><path d="M4 17V9M9.5 17V5M15 17v-7M20 17V7" stroke-linecap="round"/><path d="M3 6l6-3 5 3 6-4" stroke-linecap="round"/></svg></div>
+            <div class="sbody"><span class="pilltag">Beat-Synced</span><h3>Gaming &amp; Finance</h3><p>Montages and finance edits cut tight to the beat and the story.</p></div>
+          </article>
+          <article class="cf-slide" data-name="AI Video & 3D Video">
+            <div class="sic" style="background:linear-gradient(140deg,#c6ff3a,#3ae0ff)"><svg viewBox="0 0 24 24" fill="none" stroke="#0b0b08" stroke-width="2"><path d="M12 2.8l8.5 5v9.4L12 22l-8.5-4.8V7.8z"/><path d="M12 22V12M3.5 7.8L12 12l8.5-4.2"/></svg></div>
+            <div class="sbody"><span class="pilltag">New School</span><h3>AI Video &amp; 3D</h3><p>AI video and 3D-style edits — futuristic looks, human finishing.</p></div>
+          </article>
+        </div>
+      </div>
+      <div class="cf-controls">
+        <button class="cf-btn" id="cfPrev" aria-label="Previous slide">←</button>
+        <span id="cfLabel">Insurance Journey — Real Project</span>
+        <div class="cf-dots" id="cfDots"></div>
+        <button class="cf-btn" id="cfNext" aria-label="Next slide">→</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CAREER ================= -->
+<section id="career">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">04 — Career</span>
+      <h2>The <span class="grad">Journey</span> So Far</h2>
+    </div>
+    <div class="tl">
+      <div class="tl-item card reveal"><div class="lifey" style="--d:0s">
+        <span class="when">Freelance — Ongoing</span>
+        <h3>Freelance Video Editor · HYPER</h3>
+        <p>Short-form and long-form videos for creators and brands — reels, YouTube intros and promotional content. Meme videos, finance &amp; gaming edits, gym reels, AI video and montages, all delivered in 4K Ultra HD with a first sample edit available in 4K.</p>
+      </div></div>
+      <div class="tl-item card reveal"><div class="lifey" style="--d:.35s">
+        <span class="when">Internship — 3 Months · Remote</span>
+        <h3>Graphic Design &amp; Video Editing Intern — Dazzel Digital Pvt Ltd</h3>
+        <p>Hands-on professional experience in graphic design and video editing: creating social content, refining edits to client briefs and learning production workflows inside a real digital team.</p>
+      </div></div>
+      <div class="tl-item card reveal"><div class="lifey" style="--d:.7s">
+        <span class="when">Project — Automation</span>
+        <h3>AI Assistant using n8n</h3>
+        <p>Built an AI assistant with n8n workflow automation, integrated with a WordPress website as a working chatbot — combining my CS studies with real automation: triggers, workflows and a live website integration.</p>
+      </div></div>
+      <div class="tl-item card reveal"><div class="lifey" style="--d:1s">
+        <span class="when">Education — Pursuing</span>
+        <h3>B.Tech CSE — NGF College of Engineering and Technology</h3>
+        <p>Bachelor of Technology in Computer Science &amp; Engineering (pursuing). Schooling: Class 10th and 12th completed. The engineering mindset shows up in every edit — structured, precise, deadline-driven.</p>
+      </div></div>
+    </div>
+
+    <div class="sec-head reveal" style="margin-top:64px">
+      <span class="sec-tag">How an Edit Ships</span>
+      <h2>Process in <span class="grad">4 Steps</span></h2>
+    </div>
+    <div class="grid">
+      <article class="card reveal"><div class="lifey" style="--d:0s"><div class="step-n" style="--i:0">01</div><h3>Brief</h3><p>You share footage, idea and style. I confirm scope, price (from ₹200) and deadline before starting.</p></div></article>
+      <article class="card reveal"><div class="lifey" style="--d:.3s"><div class="step-n" style="--i:1">02</div><h3>First Cut</h3><p>Structure, pacing, music, captions and colour — the first cut lands for your review.</p></div></article>
+      <article class="card reveal"><div class="lifey" style="--d:.6s"><div class="step-n" style="--i:2">03</div><h3>Review &amp; Polish</h3><p>Your feedback goes in frame by frame: tighter cuts, stronger hooks, punchier graphics.</p></div></article>
+      <article class="card reveal"><div class="lifey" style="--d:.9s"><div class="step-n" style="--i:3">04</div><h3>Final Delivery</h3><p>Final export in 4K Ultra HD, ready to post — thumbnail support included if you need it.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TECH STACK ================= -->
+<section id="stack">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">05 — Tech Stack</span>
+      <h2>Tools of the <span class="grad">Trade</span></h2>
+    </div>
+    <div class="mini3d stack-3d reveal"><canvas id="glOrbit" aria-label="Live 3D double orbit of editing tools — tap a disc for details"></canvas><span class="hud tl">TOOL_ORBIT_3D &middot; DOUBLE RING</span><span class="hud tr">TAP A DISC</span><div id="orbitChip" role="status"><b id="orbitChipName">Premiere Pro</b><span id="orbitChipDesc">Primary editing tool</span><small>Tap again to resume orbit</small></div></div>
+    <div class="stack-grid" id="stackGrid"></div>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section id="pricing">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">06 — Pricing</span>
+      <h2>Honest <span class="grad">Pricing</span></h2>
+    </div>
+    <div class="price-wrap">
+      <div class="price-card reveal"><span class="shineband" aria-hidden="true"></span><div class="lifey" style="--d:0s">
+        <span class="pilltag lime">First sample edit available in 4K</span>
+        <p style="margin:18px 0 2px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.82rem">Edits start at just</p>
+        <div class="big">₹200<span style="font-size:.32em;color:var(--text)"> / edit</span></div>
+        <ul>
+          <li><b>✓</b> Minimum edit price ₹200 — final price depends on project length &amp; quality</li>
+          <li><b>✓</b> Affordable &amp; flexible — share your budget, we'll work it out</li>
+          <li><b>✓</b> First sample edit in 4K, so you judge the quality before committing</li>
+          <li><b>✓</b> Every delivery in 4K Ultra HD</li>
+        </ul>
+        <a class="btn" href="#contact">Get My Sample Edit →</a>
+      </div></div>
+      <div class="philo-card reveal">
+        <div class="philo"><h3>"We Grow <span>Together</span>"</h3><p>Your channel grows, my craft grows. Long-term partnerships over one-off gigs — that's the HYPER way.</p></div>
+        <div class="philo"><h3>"Truth in <span>Content</span>"</h3><p>No fake promises, no padded timelines. Honest edits, honest pricing, real results.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">07 — Contact</span>
+      <h2>Let's Make Something <span class="grad">HYPER</span></h2>
+      <p>Tell me about your project — I usually reply fast, and your first sample edit can be in 4K.</p>
+    </div>
+    <div class="mini3d contact-3d reveal"><canvas id="glContact" aria-label="Live 3D particle wave with rotating play disc"></canvas><span class="hud tl">WAVE_3D</span><span class="hud tr">LIVE RENDER</span></div>
+    <div class="contact-grid">
+      <div class="reveal">
+        <a class="c-link" href="mailto:yash36796@gmail.com"><span class="cic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><span><small>Email</small><b>yash36796@gmail.com</b></span></a>
+        <a class="c-link" href="https://www.instagram.com/yash_editz69" target="_blank" rel="noopener"><span class="cic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg></span><span><small>Instagram</small><b>@yash_editz69</b></span></a>
+        <a class="c-link" href="https://www.linkedin.com/in/yash-kumar-004071392" target="_blank" rel="noopener"><span class="cic"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="fill:var(--lime)"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg></span><span><small>LinkedIn</small><b>linkedin.com/in/yash-kumar-004071392</b></span></a>
+        <a class="c-link" href="https://yash69.my.canva.site/hyper" target="_blank" rel="noopener"><span class="cic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg></span><span><small>Canva Portfolio — HYPER</small><b>yash69.my.canva.site/hyper</b></span></a>
+        <div class="card" style="margin-top:6px"><h3>Working remotely</h3><p>Working remotely with creators and brands everywhere. Languages: All Languages.</p></div>
+      </div>
+      <form class="reveal" id="hireForm">
+        <label for="fName">Your Name</label>
+        <input id="fName" type="text" placeholder="e.g. Rahul — Fitness Creator" required>
+        <label for="fType">Project Type</label>
+        <select id="fType">
+          <option>Reels &amp; Shorts Edit</option><option>YouTube Video Edit</option><option>Motion Graphics / Explainer</option>
+          <option>Thumbnail / Poster Design</option><option>Gaming / Finance Edit</option><option>AI Video / 3D Video</option><option>Other</option>
+        </select>
+        <label for="fMsg">Project Details</label>
+        <textarea id="fMsg" rows="4" placeholder="Footage length, style you like, deadline…"></textarea>
+        <button class="btn" type="submit" style="margin-top:18px;width:100%;justify-content:center">Send via Email →</button>
+        <div id="formOk" role="status"></div>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="frow">
+      <div>
+        <a class="logo" href="#top" style="font-size:1.05rem">YASH<em style="font-style:normal;color:var(--lime)">.KUMAR</em></a>
+        <p>Professional Video Editor · Thumbnails · Motion Graphics · Reels Expert.</p>
+      </div>
+      <div style="text-align:right">
+        <p><a href="mailto:yash36796@gmail.com">yash36796@gmail.com</a> · <a href="https://www.instagram.com/yash_editz69" target="_blank" rel="noopener">@yash_editz69</a> · <a href="https://www.linkedin.com/in/yash-kumar-004071392" target="_blank" rel="noopener">LinkedIn</a></p>
+        <p class="credit">© 2026 Yash Kumar · HYPER — We Grow Together</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div id="workLightbox" role="dialog" aria-modal="true" aria-label="Video player" hidden>
+  <div class="lb-backdrop" data-lb-close></div>
+  <div class="lb-panel" id="workLightboxPanel">
+    <div class="lb-top"><b id="workLightboxTitle">Video</b><button class="lb-close" id="workLightboxClose" aria-label="Close video player">✕</button></div>
+    <video id="workLightboxVideo" preload="none" playsinline controls></video>
+    <p class="lb-caption"><span id="workLightboxCaption"></span><span class="lb-meta" id="workLightboxMeta"></span></p>
+  </div>
+</div>
+
+<div id="thumbLightbox" role="dialog" aria-modal="true" aria-label="Thumbnail viewer" hidden>
+  <div class="lb-backdrop" data-lb-close></div>
+  <div class="lb-panel wide" id="thumbLightboxPanel">
+    <div class="lb-top"><b id="thumbLightboxTitle">Thumbnail</b><button class="lb-close" id="thumbLightboxClose" aria-label="Close thumbnail viewer">✕</button></div>
+    <img id="thumbLightboxImg" alt="">
+    <p class="lb-caption"><span id="thumbLightboxCaption"></span><span class="lb-meta" id="thumbLightboxMeta">YouTube Thumbnail · 1280 × 720</span></p>
+  </div>
+</div>
+
+<script>
+/* ============ data: services + stack (original copy) ============ */
+var ICONS = {
+  cut:'<path d="M4 8h13M4 16h9"/><circle cx="19" cy="8" r="2"/><circle cx="16" cy="16" r="2"/>',
+  phone:'<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 8.5l5 3.5-5 3.5z"/>',
+  motion:'<path d="M3 17c5-9 8 3 12-6 2-4 4-5 6-5"/><circle cx="19" cy="7" r="2"/>',
+  logo:'<path d="M12 3l2.2 5.3L20 9l-4.2 3.9L17 18.5 12 15.7 7 18.5l1.2-5.6L4 9l5.8-.7z"/>',
+  chart:'<path d="M4 17V9M9.5 17V5M15 17v-7M20 17V7" stroke-linecap="round"/><path d="M3 6l6-3 5 3 6-4"/>',
+  gym:'<path d="M7 8v8M4 10v4M17 8v8M20 10v4M7 12h10" stroke-linecap="round"/>',
+  meme:'<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.4 2.2 2 3.5 2s2.5-.6 3.5-2"/><circle cx="9" cy="9.5" r="1" fill="currentColor"/><circle cx="15" cy="9.5" r="1" fill="currentColor"/>',
+  img:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.7"/><path d="M3 17l5.5-4 4 3 3.5-2.5L21 17"/>',
+  poster:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/>',
+  ai:'<rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><circle cx="12" cy="12" r="2"/>',
+  game:'<path d="M7 8h10a5 5 0 0 1 5 5c0 2.8-2.2 5-5 5-1.5 0-2.6-.7-3.5-1.7h-3C9.6 17.3 8.5 18 7 18a5 5 0 0 1-5-5 5 5 0 0 1 5-5z"/><path d="M8 11v4M6 13h4" stroke-linecap="round"/>',
+  cube:'<path d="M12 2.8l8.5 5v9.4L12 22l-8.5-4.8V7.8z"/><path d="M12 22V12M3.5 7.8L12 12l8.5-4.2"/>',
+  grade:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none" opacity=".55"/>',
+  cap:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h4M13.5 15H17M7 10.5h7" stroke-linecap="round"/>'
+};
+var SERVICES = [
+  ['Video Editing','cut','Short-form and long-form edits with clean cuts, tight pacing and a story that holds till the last frame.'],
+  ['Reels & Shorts + Instagram Edits','phone','Every type of Instagram edit — hooks in second one, loops that beg a replay, trends ridden early.'],
+  ['Motion Graphics','motion','Animated text, kinetic type and explainer graphics that make ideas impossible to ignore.'],
+  ['Logo Animations','logo','Your logo, alive — intros and outros with bounce, glow and character.'],
+  ['Finance & Gaming Edits','chart','Charts that land and gameplay that pops — niche edits that respect the audience.'],
+  ['Gym Reels & Trendy Edits','gym','Beast-mode cuts for fitness creators: beat drops synced to every rep.'],
+  ['Meme Videos','meme','Timing is everything. Meme edits cut exactly where the laugh lives.'],
+  ['Thumbnail Design','img','Faces, contrast, curiosity — thumbnails engineered for the click.'],
+  ['Posters & Banners','poster','Posters and channel banners with bold type and clean hierarchy.'],
+  ['AI Video','ai','AI-generated visuals finished by a human editor — futuristic, but watchable.'],
+  ['Gaming Montages','game','Frag movies and montages cut frame-tight to the beat.'],
+  ['3D Video','cube','Depth, parallax and 3D-style moves that make flat footage feel huge.'],
+  ['Colour Grading','grade','From flat log to filmic glow — a grade matched to your brand.'],
+  ['Captions & Subtitles','cap','Word-by-word animated captions that keep thumbs from scrolling away.']
+];
+var sg = document.getElementById('serviceGrid');
+SERVICES.forEach(function(s,i){
+  var el = document.createElement('article');
+  el.className = 'card reveal';
+  el.innerHTML = '<div class="lifey" style="--d:'+(i%5*0.25)+'s"><span class="num">/'+String(i+1).padStart(2,'0')+'</span><span class="ic" style="--i:'+i+'"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ICONS[s[1]]+'</svg></span><h3>'+s[0]+'</h3><p>'+s[2]+'</p></div>';
+  sg.appendChild(el);
+});
+var STACK = [
+  ['Pr','Adobe Premiere Pro','Primary editor','t-lime'],['Ae','After Effects','Motion graphics','t-violet'],
+  ['Am','Alight Motion','Mobile motion','t-pink'],['Cc','CapCut','Fast reels','t-cyan'],
+  ['Cv','Canva','Design & thumbs','t-cyan'],['n8n','n8n + AI Chatbots','Automation','t-lime'],
+  ['C','C / C++ / Java','Basics','t-violet'],['</>','HTML · CSS · JS','Web basics','t-pink'],
+  ['Ms','MS Word / Excel','Docs & sheets','t-cyan'],['W','Windows','Daily OS','t-lime']
+];
+var tg = document.getElementById('stackGrid');
+STACK.forEach(function(t,i){
+  var el = document.createElement('div');
+  el.className = 'tool reveal';
+  el.innerHTML = '<span class="tic '+t[3]+'" style="--i:'+i+'">'+t[0]+'</span><b>'+t[1]+'</b><span>'+t[2]+'</span>';
+  tg.appendChild(el);
+});
+
+/* ============ loader ============ */
+window.addEventListener('load', function(){ setTimeout(function(){ document.getElementById('loader').classList.add('done'); }, 650); });
+setTimeout(function(){ document.getElementById('loader').classList.add('done'); }, 2600);
+
+/* ============ custom cursor ============ */
+(function(){
+  var dot = document.getElementById('curDot'), ring = document.getElementById('curRing');
+  var mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
+  document.addEventListener('mousemove', function(e){ mx = e.clientX; my = e.clientY; dot.style.left = mx+'px'; dot.style.top = my+'px'; });
+  (function loop(){ rx += (mx-rx)*0.16; ry += (my-ry)*0.16; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(loop); })();
+  document.querySelectorAll('a,button,.card,.cf-slide').forEach(function(el){
+    el.addEventListener('mouseenter', function(){ ring.classList.add('big'); });
+    el.addEventListener('mouseleave', function(){ ring.classList.remove('big'); });
+  });
+})();
+
+/* ============ progress + reveal ============ */
+var prog = document.getElementById('progress');
+addEventListener('scroll', function(){
+  var h = document.documentElement, p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+  prog.style.width = (p*100)+'%';
+}, {passive:true});
+var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, {threshold:0.12});
+document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+/* failsafes: content must never stay invisible — manual rect check + timed reveal-all */
+function revealCheck(){
+  document.querySelectorAll('.reveal:not(.in)').forEach(function(el){
+    var r = el.getBoundingClientRect();
+    if(r.top < innerHeight * 0.94 && r.bottom > 0){ el.classList.add('in'); io.unobserve(el); }
+  });
+}
+addEventListener('scroll', revealCheck, {passive:true});
+setInterval(revealCheck, 900);
+setTimeout(function(){ document.querySelectorAll('.reveal:not(.in)').forEach(function(el){ el.classList.add('in'); }); }, 3400);
+revealCheck();
+
+/* ============ marquee duplicate: 4 copies so the -50% loop is seamless on any screen width ============ */
+document.querySelectorAll('[data-dup]').forEach(function(t){
+  var h = t.innerHTML;
+  t.innerHTML = h + h + h + h;
+});
+
+/* ============ rotating roles ============ */
+(function(){
+  var roles = ['Video Editor','Reels Expert','Motion Graphics Artist','Thumbnail Designer','HYPER Editor'];
+  var i = 0, el = document.getElementById('roleWord');
+  setInterval(function(){
+    i = (i+1) % roles.length;
+    el.classList.remove('swap'); void el.offsetWidth;
+    el.textContent = roles[i]; el.classList.add('swap');
+  }, 2300);
+})();
+
+/* ============ 3D hero name: extrusion layers + mouse tilt ============ */
+/* Each letter gets 11 copies stepped back in Z (lime shading to deep violet
+   for YASH, grey-to-violet outline for hollow KUMAR), so the name has real
+   extruded depth under perspective. The CSS text-shadow stack on the face
+   keeps the depth even if this script never runs. Tilt is lerped, loops
+   forever with the sway animation, and never freezes. */
+(function(){
+  var name = document.querySelector('h1.name3d');
+  if(!name) return;
+  var limeShades = ['#9fe02a','#86cc1e','#6fae17','#5a8f13','#477010','#36540d','#2b4309','#223408','#3a2a6b','#241a4a','#150f30'];
+  var hollowShades = ['#c9c9d6','#a8a8c0','#8b8bb0','#6f6fa8','#5a5596','#463f80','#352f66','#282350','#1e1a3e','#171331','#100d24'];
+  name.querySelectorAll('.ch3d').forEach(function(wrap){
+    var face = wrap.querySelector('.ch-face');
+    if(!face) return;
+    var shades = wrap.classList.contains('hollow') ? hollowShades : limeShades;
+    shades.forEach(function(c, idx){
+      var d = document.createElement('span');
+      d.className = 'ch-depth';
+      d.setAttribute('aria-hidden', 'true');
+      d.textContent = face.textContent;
+      d.style.setProperty('--z', idx + 1);
+      d.style.setProperty('--depth', c);
+      wrap.insertBefore(d, face);
+    });
+  });
+  name.classList.add('has-depth');
+  var hero = document.querySelector('.hero');
+  var tx = 0, ty = 0, cx = 0, cy = 0;
+  document.addEventListener('mousemove', function(e){
+    if(!hero) return;
+    var r = hero.getBoundingClientRect();
+    tx = ((e.clientX - r.left) / (r.width || 1) - 0.5) * 11;
+    ty = ((e.clientY - r.top) / (r.height || 1) - 0.5) * -8;
+  }, {passive:true});
+  if(hero) hero.addEventListener('mouseleave', function(){ tx = 0; ty = 0; });
+  (function tilt(){
+    cx += (tx - cx) * 0.06; cy += (ty - cy) * 0.06;
+    name.style.transform = 'rotateY(' + cx.toFixed(2) + 'deg) rotateX(' + cy.toFixed(2) + 'deg)';
+    requestAnimationFrame(tilt);
+  })();
+})();
+
+/* ============ looping timecode (11.24s @ 24fps) ============ */
+(function(){
+  var tc = document.getElementById('timecode'), DUR = 11.241, t0 = performance.now();
+  function pad(n){ return (n<10?'0':'')+n; }
+  (function tick(){
+    var t = ((performance.now()-t0)/1000) % DUR;
+    var f = Math.floor((t % 1) * 24), s = Math.floor(t) % 60, m = Math.floor(t/60), h = Math.floor(t/3600);
+    tc.textContent = pad(h)+':'+pad(m)+':'+pad(s)+':'+pad(f);
+    requestAnimationFrame(tick);
+  })();
+})();
+
+/* ============ showreel ============ */
+(function(){
+  var v = document.getElementById('reelVideo'), ov = document.getElementById('playOverlay');
+  function playReel(){
+    var p = v.play();
+    if(p && p.catch) p.catch(function(){
+      v.addEventListener('canplay', function h(){ v.removeEventListener('canplay', h); v.play().catch(function(){}); });
+    });
+  }
+  ov.addEventListener('click', playReel);
+  v.addEventListener('play', function(){ ov.classList.add('hidden'); });
+  v.addEventListener('pause', function(){ ov.classList.remove('hidden'); });
+  v.addEventListener('ended', function(){ ov.classList.remove('hidden'); });
+  document.getElementById('workReelTile').addEventListener('click', function(){
+    document.getElementById('reel').scrollIntoView({behavior:'smooth', block:'center'});
+    setTimeout(function(){ playReel(); }, 550);
+  });
+})();
+
+/* ============ work filter ============ */
+document.querySelectorAll('.fbtn').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.fbtn').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    var f = b.getAttribute('data-filter');
+    document.querySelectorAll('#workGrid [data-cat]').forEach(function(c){
+      c.classList.toggle('work-hide', f !== 'all' && c.getAttribute('data-cat') !== f);
+    });
+  });
+});
+
+/* ============ Work video lightbox (data-driven: any tile with data-video-src opens it) ============ */
+(function(){
+  var lb = document.getElementById('workLightbox');
+  var v = document.getElementById('workLightboxVideo');
+  var panel = document.getElementById('workLightboxPanel');
+  var titleEl = document.getElementById('workLightboxTitle');
+  var capEl = document.getElementById('workLightboxCaption');
+  var metaEl = document.getElementById('workLightboxMeta');
+  var closeBtn = document.getElementById('workLightboxClose');
+  if(!lb || !v) return;
+  var lastTile = null, openSeq = 0;
+  function openLb(tile){
+    lastTile = tile;
+    var openId = ++openSeq;
+    var landscape = tile.getAttribute('data-video-orient') === 'landscape';
+    titleEl.textContent = tile.getAttribute('data-video-title') || 'Video';
+    capEl.textContent = tile.getAttribute('data-video-caption') || '';
+    metaEl.textContent = tile.getAttribute('data-video-meta') || '';
+    panel.classList.toggle('landscape', landscape);
+    v.classList.toggle('landscape', landscape);
+    v.preload = 'auto';
+    v.poster = tile.getAttribute('data-video-poster') || '';
+    v.src = tile.getAttribute('data-video-src');
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+    var main = document.getElementById('reelVideo');
+    if(main && !main.paused) main.pause();
+    v.muted = false;
+    v.addEventListener('error', function onErr(){
+      if(openId === openSeq) capEl.textContent = 'Video could not load — close and tap the tile again.';
+    }, {once:true});
+    function attemptPlay(){
+      var p = v.play();
+      if(p && p.catch) p.catch(function(){
+        if(openId !== openSeq) return;
+        if(!v.muted){ v.muted = true; attemptPlay(); }
+      });
+    }
+    attemptPlay();
+    /* If the first play() ran before the new source had metadata (a rejected
+       promise on some mobile browsers), retry once the data is ready — the
+       tap's user activation is still live for local files. */
+    v.addEventListener('loadedmetadata', function onMeta(){
+      if(openId === openSeq && v.paused && !v.ended) attemptPlay();
+    }, {once:true});
+    closeBtn.focus();
+  }
+  function closeLb(){
+    v.pause();
+    v.removeAttribute('src');
+    v.removeAttribute('poster');
+    v.load();
+    lb.hidden = true;
+    document.body.style.overflow = '';
+    if(lastTile) lastTile.focus();
+  }
+  document.querySelectorAll('[data-video-src]').forEach(function(tile){
+    tile.addEventListener('click', function(){ openLb(tile); });
+  });
+  closeBtn.addEventListener('click', closeLb);
+  lb.querySelector('.lb-backdrop').addEventListener('click', closeLb);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !lb.hidden) closeLb();
+  });
+  v.addEventListener('ended', function(){ try{ v.currentTime = 0; }catch(e){} });
+})();
+
+/* ============ Thumbnail image lightbox (data-driven: any card with data-thumb-src opens it) ============ */
+(function(){
+  var lb = document.getElementById('thumbLightbox');
+  var panel = document.getElementById('thumbLightboxPanel');
+  var img = document.getElementById('thumbLightboxImg');
+  var titleEl = document.getElementById('thumbLightboxTitle');
+  var capEl = document.getElementById('thumbLightboxCaption');
+  var metaEl = document.getElementById('thumbLightboxMeta');
+  var closeBtn = document.getElementById('thumbLightboxClose');
+  if(!lb || !img) return;
+  var lastCard = null;
+  function openLb(card){
+    lastCard = card;
+    var isPortrait = card.getAttribute('data-thumb-orientation') === 'portrait';
+    titleEl.textContent = card.getAttribute('data-thumb-title') || 'Thumbnail';
+    capEl.textContent = card.getAttribute('data-thumb-caption') || '';
+    if(metaEl) metaEl.textContent = card.getAttribute('data-thumb-meta') || '';
+    img.alt = card.getAttribute('data-thumb-title') || 'Thumbnail design, full size';
+    img.classList.toggle('portrait', isPortrait);
+    if(panel) panel.classList.toggle('portrait', isPortrait);
+    img.src = card.getAttribute('data-thumb-src');
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+  function closeLb(){
+    lb.hidden = true;
+    document.body.style.overflow = '';
+    img.removeAttribute('src');
+    img.classList.remove('portrait');
+    if(panel) panel.classList.remove('portrait');
+    if(lastCard) lastCard.focus();
+  }
+  document.querySelectorAll('[data-thumb-src]').forEach(function(card){
+    card.addEventListener('click', function(){ openLb(card); });
+  });
+  closeBtn.addEventListener('click', closeLb);
+  lb.querySelector('.lb-backdrop').addEventListener('click', closeLb);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !lb.hidden) closeLb();
+  });
+})();
+
+/* ============ 3D coverflow ============ */
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.cf-slide'));
+  var dotsWrap = document.getElementById('cfDots'), label = document.getElementById('cfLabel');
+  var cur = 0, timer = null, N = slides.length;
+  slides.forEach(function(_, i){
+    var d = document.createElement('button');
+    d.setAttribute('aria-label', 'Go to slide '+(i+1));
+    d.addEventListener('click', function(){ go(i); restart(); });
+    dotsWrap.appendChild(d);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+  function render(){
+    slides.forEach(function(s, i){
+      var off = i - cur, a = Math.abs(off);
+      s.style.transform = 'translate(-50%,-50%) translateX('+(off*58)+'%) rotateY('+(-off*36)+'deg) translateZ('+(-a*170)+'px) scale('+(1 - a*0.13)+')';
+      s.style.opacity = a > 2 ? 0 : (1 - a*0.22);
+      s.style.zIndex = 20 - a;
+      s.style.pointerEvents = a > 2 ? 'none' : 'auto';
+    });
+    dots.forEach(function(d, i){ d.classList.toggle('on', i === cur); });
+    label.textContent = slides[cur].getAttribute('data-name');
+  }
+  function go(i){ cur = (i + N) % N; render(); }
+  function next(){ go(cur + 1); }
+  function restart(){ clearInterval(timer); timer = setInterval(next, 3200); }
+  document.getElementById('cfNext').addEventListener('click', function(){ go(cur+1); restart(); });
+  document.getElementById('cfPrev').addEventListener('click', function(){ go(cur-1); restart(); });
+  var view = document.getElementById('cfView'), sx = null;
+  view.addEventListener('pointerdown', function(e){ sx = e.clientX; });
+  view.addEventListener('pointerup', function(e){
+    if(sx === null) return;
+    var dx = e.clientX - sx; sx = null;
+    if(Math.abs(dx) > 42){ go(cur + (dx < 0 ? 1 : -1)); restart(); }
+  });
+  view.addEventListener('mouseenter', function(){ clearInterval(timer); });
+  view.addEventListener('mouseleave', restart);
+  render(); restart();
+})();
+
+/* ============ hire form -> mailto ============ */
+document.getElementById('hireForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = document.getElementById('fName').value.trim(),
+      type = document.getElementById('fType').value,
+      msg  = document.getElementById('fMsg').value.trim();
+  var body = 'Hi Yash, I am ' + (name || '...') + '.\n\nProject: ' + type + '\n\n' + msg + '\n\n(Please find my footage attached / linked.)';
+  var ok = document.getElementById('formOk');
+  ok.style.display = 'block';
+  ok.textContent = 'Opening your email app with the brief ready — just press send there. No email app? Write to yash36796@gmail.com directly.';
+  location.href = 'mailto:yash36796@gmail.com?subject=' + encodeURIComponent('Video Edit Enquiry — ' + type) + '&body=' + encodeURIComponent(body);
+});
+
+/* ============ 3D HERO SCENE (original primitives, Three.js) ============ */
+(function(){
+  var stage = document.getElementById('stage'), canvas = document.getElementById('gl');
+  if(!window.THREE){ stage.classList.add('nogl'); return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true, alpha: true}); }
+  catch(e){ stage.classList.add('nogl'); return; }
+  var W = stage.clientWidth, H = stage.clientHeight, mobile = W < 620;
+  renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.6 : 2));
+  renderer.setSize(W, H);
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x07070d, 0.028);
+  var cam = new THREE.PerspectiveCamera(46, W/H, 0.1, 100);
+  cam.position.set(0, 0.6, 11.5);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  var key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(4, 6, 6); scene.add(key);
+  var pLime = new THREE.PointLight(0xc6ff3a, 60, 30); pLime.position.set(-5, 3, 4); scene.add(pLime);
+  var pVio = new THREE.PointLight(0x8b5cf6, 70, 30); pVio.position.set(5, -2, 3); scene.add(pVio);
+
+  var world = new THREE.Group(); scene.add(world);
+  var LIME = 0xc6ff3a, VIOLET = 0x8b5cf6, CYAN = 0x3ae0ff, DARK = 0x171728;
+
+  /* centre: play-button disc (original construction) */
+  var heroG = new THREE.Group(); world.add(heroG);
+  var disc = new THREE.Mesh(
+    new THREE.CylinderGeometry(2.05, 2.05, 0.42, 56),
+    new THREE.MeshStandardMaterial({color: DARK, roughness: 0.35, metalness: 0.65})
+  );
+  disc.rotation.x = Math.PI/2; heroG.add(disc);
+  var rim = new THREE.Mesh(
+    new THREE.TorusGeometry(2.05, 0.07, 14, 72),
+    new THREE.MeshStandardMaterial({color: LIME, emissive: LIME, emissiveIntensity: 0.55, roughness: 0.3, metalness: 0.4})
+  );
+  rim.position.z = 0.21; heroG.add(rim);
+  var rim2 = rim.clone(); rim2.position.z = -0.21; heroG.add(rim2);
+  var triShape = new THREE.Shape();
+  triShape.moveTo(-0.62, -0.78); triShape.lineTo(-0.62, 0.78); triShape.lineTo(0.85, 0); triShape.closePath();
+  var tri = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(triShape, {depth: 0.3, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 2}),
+    new THREE.MeshStandardMaterial({color: LIME, emissive: LIME, emissiveIntensity: 0.35, roughness: 0.25, metalness: 0.3})
+  );
+  tri.position.set(0.08, 0, 0.22); heroG.add(tri);
+  var ringA = new THREE.Mesh(new THREE.TorusGeometry(3.05, 0.035, 10, 90),
+    new THREE.MeshStandardMaterial({color: VIOLET, emissive: VIOLET, emissiveIntensity: 0.5, roughness: 0.4}));
+  ringA.rotation.x = Math.PI/2.4; world.add(ringA);
+  var ringB = new THREE.Mesh(new THREE.TorusGeometry(3.6, 0.028, 10, 90),
+    new THREE.MeshStandardMaterial({color: CYAN, emissive: CYAN, emissiveIntensity: 0.45, roughness: 0.4}));
+  ringB.rotation.x = Math.PI/1.7; ringB.rotation.y = 0.5; world.add(ringB);
+
+  /* film-strip frames: outlined boxes floating on both sides */
+  var frames = [];
+  function makeFrame(x, y, z, c, s){
+    var g = new THREE.Group();
+    var geo = new THREE.BoxGeometry(1.25*s, 0.92*s, 0.06);
+    var mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({color: 0x10101c, roughness: 0.5, metalness: 0.5}));
+    g.add(mesh);
+    var edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({color: c}));
+    g.add(edges);
+    [-0.44, 0.44].forEach(function(off){
+      var hole = new THREE.Mesh(new THREE.BoxGeometry(0.11*s, 0.11*s, 0.09),
+        new THREE.MeshBasicMaterial({color: c}));
+      hole.position.set(off*s, 0.32*s, 0); g.add(hole);
+      var hole2 = hole.clone(); hole2.position.y = -0.32*s; g.add(hole2);
+    });
+    g.position.set(x, y, z);
+    g.rotation.set(Math.random()*0.5-0.25, Math.random()*0.7-0.35, Math.random()*0.3-0.15);
+    world.add(g); frames.push({g: g, y: y, ph: Math.random()*6.28, sp: 0.5 + Math.random()*0.7});
+    return g;
+  }
+  makeFrame(-3.9, 1.5, -0.4, LIME, 1);
+  makeFrame(-4.3, -1.1, 0.4, CYAN, 0.85);
+  makeFrame(4.0, 1.7, -0.2, VIOLET, 0.95);
+  makeFrame(4.35, -1.3, 0.5, LIME, 0.8);
+  makeFrame(-3.3, -2.4, -1.2, VIOLET, 0.7);
+  makeFrame(3.4, -2.5, -1.0, CYAN, 0.72);
+
+  /* timeline bar with clips underneath */
+  var tlG = new THREE.Group(); tlG.position.set(0, -3.15, 0.4); world.add(tlG);
+  var barBase = new THREE.Mesh(new THREE.BoxGeometry(7.6, 0.5, 0.22),
+    new THREE.MeshStandardMaterial({color: 0x10101c, roughness: 0.45, metalness: 0.6}));
+  tlG.add(barBase);
+  var clipCols = [CYAN, LIME, 0xff4d7e, 0xfebc2e, VIOLET, LIME, CYAN];
+  var cx = -3.55;
+  clipCols.forEach(function(c, i){
+    var w = [1.15, 0.7, 1.3, 0.85, 1.1, 0.75, 1.0][i];
+    var cl = new THREE.Mesh(new THREE.BoxGeometry(w, 0.34, 0.3),
+      new THREE.MeshStandardMaterial({color: c, emissive: c, emissiveIntensity: 0.28, roughness: 0.4}));
+    cl.position.set(cx + w/2, 0, 0.03); tlG.add(cl); cx += w + 0.09;
+  });
+  var head = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.85, 0.34),
+    new THREE.MeshBasicMaterial({color: 0xffffff}));
+  head.position.set(-3.7, 0, 0.05); tlG.add(head);
+
+  /* orbiting shapes */
+  var orbiters = [];
+  function addOrbiter(geo, color, radius, speed, size, yOff){
+    var m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({color: color, emissive: color, emissiveIntensity: 0.3, roughness: 0.3, metalness: 0.4}));
+    m.scale.setScalar(size);
+    scene.add(m);
+    orbiters.push({m: m, r: radius, sp: speed, ph: Math.random()*6.28, y: yOff});
+  }
+  addOrbiter(new THREE.OctahedronGeometry(0.34), LIME, 4.6, 0.35, 1, 1.2);
+  addOrbiter(new THREE.IcosahedronGeometry(0.3), VIOLET, 5.2, -0.26, 1, -0.8);
+  addOrbiter(new THREE.TorusGeometry(0.3, 0.11, 10, 26), CYAN, 5.0, 0.3, 1, 0.4);
+  addOrbiter(new THREE.BoxGeometry(0.42, 0.42, 0.42), 0xff4d7e, 4.4, -0.4, 1, -1.6);
+  addOrbiter(new THREE.OctahedronGeometry(0.22), CYAN, 3.9, 0.5, 1, 2.1);
+
+  /* particles */
+  var pCount = mobile ? 130 : 260;
+  var pGeo = new THREE.BufferGeometry(), pos = new Float32Array(pCount*3);
+  for(var i = 0; i < pCount; i++){
+    pos[i*3] = (Math.random()-0.5)*17; pos[i*3+1] = (Math.random()-0.5)*10; pos[i*3+2] = (Math.random()-0.5)*7 - 1;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  var points = new THREE.Points(pGeo, new THREE.PointsMaterial({color: LIME, size: 0.05, transparent: true, opacity: 0.65}));
+  scene.add(points);
+
+  /* mouse parallax */
+  var tx = 0, ty = 0, mx2 = 0, my2 = 0;
+  stage.addEventListener('mousemove', function(e){
+    var r = stage.getBoundingClientRect();
+    tx = ((e.clientX - r.left)/r.width - 0.5) * 2;
+    ty = ((e.clientY - r.top)/r.height - 0.5) * 2;
+  });
+  stage.addEventListener('mouseleave', function(){ tx = 0; ty = 0; });
+  if(window.DeviceOrientationEvent && mobile){
+    addEventListener('deviceorientation', function(e){
+      if(e.gamma !== null){ tx = e.gamma/28; ty = (e.beta - 45)/28; }
+    });
+  }
+
+  var clock = new THREE.Clock();
+  (function animate(){
+    requestAnimationFrame(animate);
+    var t = clock.getElapsedTime();
+    mx2 += (tx - mx2) * 0.045; my2 += (ty - my2) * 0.045;
+    world.rotation.y = t * 0.14 + mx2 * 0.55;
+    world.rotation.x = Math.sin(t * 0.22) * 0.05 + my2 * 0.32;
+    heroG.position.y = Math.sin(t * 0.9) * 0.14;
+    heroG.rotation.z = Math.sin(t * 0.5) * 0.04;
+    tri.material.emissiveIntensity = 0.3 + Math.sin(t * 2.4) * 0.16;
+    ringA.rotation.z = t * 0.25; ringB.rotation.z = -t * 0.18;
+    frames.forEach(function(f){ f.g.position.y = f.y + Math.sin(t * f.sp + f.ph) * 0.22; f.g.rotation.y += 0.0022; });
+    head.position.x = -3.7 + ((t * 0.85) % 7.4);
+    orbiters.forEach(function(o){
+      var a = t * o.sp + o.ph;
+      o.m.position.set(Math.cos(a) * o.r, o.y + Math.sin(t * 0.8 + o.ph) * 0.35, Math.sin(a) * o.r - 1.2);
+      o.m.rotation.x = t * 0.7; o.m.rotation.y = t * 0.55;
+    });
+    points.rotation.y = t * 0.018;
+    cam.position.x = mx2 * 0.55; cam.position.y = 0.6 - my2 * 0.4;
+    cam.lookAt(0, -0.2, 0);
+    renderer.render(scene, cam);
+  })();
+
+  addEventListener('resize', function(){
+    var w = stage.clientWidth, h = stage.clientHeight;
+    cam.aspect = w/h; cam.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+})();
+</script>
+<script>
+/* ============ EXTRA LIVE 3D SCENES (all original primitives) ============ */
+(function(){
+  if(!window.THREE) return;
+  /* Animations stay ON: the loops below must keep running even when the
+     operating system asks for reduced motion — the user asked for motion. */
+  var SMALL = innerWidth < 640;
+  var LIME=0xc6ff3a, VIOLET=0x8b5cf6, CYAN=0x3ae0ff, PINK=0xff4d7e, GOLD=0xfebc2e, DARKM=0x171728;
+  function visTracker(el){
+    var s={visible:true};
+    if('IntersectionObserver' in window && el){
+      new IntersectionObserver(function(es){ es.forEach(function(e){ s.visible=e.isIntersecting; }); },{rootMargin:'120px'}).observe(el);
+    }
+    return s;
+  }
+  function mkRenderer(canvas){
+    try{
+      var r=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+      r.setPixelRatio(Math.min(devicePixelRatio||1,1.6));
+      /* If the phone/webview loses the WebGL context, show the animated CSS/SVG
+         fallback instead of a dead black canvas. */
+      canvas.addEventListener('webglcontextlost',function(e){ e.preventDefault();
+        var el=canvas.closest('.stage,.mini3d,#charCompanion'); if(el) el.classList.add('nogl');
+      });
+      canvas.addEventListener('webglcontextrestored',function(){
+        var el=canvas.closest('.stage,.mini3d,#charCompanion'); if(el) el.classList.remove('nogl');
+      });
+      return r;
+    }catch(e){ return null; }
+  }
+  function sizeTo(r,cam,el){
+    var w=el.clientWidth||el.parentElement.clientWidth||300, h=el.clientHeight||el.parentElement.clientHeight||200;
+    r.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix();
+  }
+  function lights(scene){
+    scene.add(new THREE.AmbientLight(0xffffff,0.6));
+    var d=new THREE.DirectionalLight(0xffffff,1.0); d.position.set(4,6,6); scene.add(d);
+    var p=new THREE.PointLight(LIME,40,25); p.position.set(-4,3,4); scene.add(p);
+    var p2=new THREE.PointLight(VIOLET,50,25); p2.position.set(5,-2,3); scene.add(p2);
+  }
+  function stdMat(c,e){ return new THREE.MeshStandardMaterial({color:c,emissive:e||c,emissiveIntensity:e?0.35:0.05,roughness:0.35,metalness:0.45}); }
+
+  /* ---- 7) STARFIELD (fixed background) ---- */
+  (function(){
+    var cv=document.getElementById('starCanvas'); if(!cv) return;
+    var r=mkRenderer(cv); if(!r) return;
+    var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,100); cam.position.z=14;
+    var n=SMALL?140:340, geo=new THREE.BufferGeometry(), pos=new Float32Array(n*3), col=new Float32Array(n*3);
+    var palette=[[0.78,1,0.23],[0.55,0.36,0.96],[0.23,0.88,1],[1,1,1]];
+    for(var i=0;i<n;i++){ pos[i*3]=(Math.random()-0.5)*36; pos[i*3+1]=(Math.random()-0.5)*22; pos[i*3+2]=(Math.random()-0.5)*10-2; var c=palette[i%4]; col[i*3]=c[0]; col[i*3+1]=c[1]; col[i*3+2]=c[2]; }
+    geo.setAttribute('position',new THREE.BufferAttribute(pos,3)); geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+    var pts=new THREE.Points(geo,new THREE.PointsMaterial({size:0.09,vertexColors:true,transparent:true,opacity:0.85}));
+    scene.add(pts);
+    function rs(){ r.setSize(innerWidth,innerHeight,false); cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); }
+    rs(); addEventListener('resize',rs);
+    var cl=new THREE.Clock();
+    (function anim(){ requestAnimationFrame(anim); var t=cl.getElapsedTime(); pts.rotation.y=t*0.012; pts.rotation.x=Math.sin(t*0.05)*0.03; r.render(scene,cam); })();
+  })();
+
+  /* ---- 1) TRAVELLING 3D EDITOR CHARACTER (original, primitives only) ---- */
+  (function(){
+    var wrap=document.getElementById('charCompanion'); if(!wrap) return;
+    var cv=document.getElementById('glChar'), label=document.getElementById('charLabel');
+    /* --- interactivity: tap bubble, reactions, idle sleep (works for SVG fallback too) --- */
+    var bubble=document.getElementById('charBubble'), zzz=document.getElementById('charZzz');
+    var LINES=['Hi! Main Yash ka edit buddy hoon','Edits \u20B9200 se start \u2014 4K quality!','Showreel dekha? Upar play dabao!','Reels, thumbnails, motion graphics \u2014 sab milta hai!','Hire Me dabao, Yash se baat karo!'];
+    var lineIdx=0, bubbleTO=null, lastActiveMs=Date.now(), sleeping=false;
+    var jumpQueued=false, celebrateQueued=false, formQueued=false, orbitQueued=false;
+    function showBubble(txt,ms){ if(!bubble) return; bubble.textContent=txt; bubble.classList.add('show'); clearTimeout(bubbleTO); bubbleTO=setTimeout(function(){ bubble.classList.remove('show'); }, ms||3500); }
+    function wake(){ lastActiveMs=Date.now(); sleeping=false; if(zzz) zzz.classList.remove('show'); }
+    wrap.addEventListener('click',function(){ wake(); jumpQueued=true; showBubble(LINES[lineIdx%LINES.length]); lineIdx++; });
+    ['pointerdown','keydown','touchstart'].forEach(function(ev){ document.addEventListener(ev,wake,{passive:true}); });
+    addEventListener('scroll',wake,{passive:true});
+    var rvEl=document.getElementById('reelVideo'); if(rvEl) rvEl.addEventListener('play',function(){ celebrateQueued=true; wake(); });
+    var hfEl=document.getElementById('hireForm'); if(hfEl) hfEl.addEventListener('submit',function(){ formQueued=true; showBubble('Message ready! Email app me Send dabao',3600); });
+    document.addEventListener('orbitpick',function(){ orbitQueued=true; wake(); });
+    var r=mkRenderer(cv);
+    if(!r){ wrap.classList.add('nogl'); return; }
+    var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(40,wrap.clientWidth/Math.max(wrap.clientHeight,1),0.1,100); cam.position.set(0,0.5,8.2); cam.lookAt(0,0.1,0);
+    lights(scene);
+    var SEG=SMALL?16:24;
+    function M(c,e,ei){ return new THREE.MeshStandardMaterial({color:c,emissive:e||c,emissiveIntensity:(ei==null?0.06:ei),roughness:0.45,metalness:0.25}); }
+    var skin=M(0xffcf9e,0xffcf9e,0.02), hoodie=M(0xc6ff3a,0xc6ff3a,0.12), hoodieD=M(0x9ed42e,0x9ed42e,0.08), capM=M(0x8b5cf6,0x8b5cf6,0.18), darkM=M(0x23233a,0x23233a,0.05), cyanM=M(0x3ae0ff,0x3ae0ff,0.4), pinkM=M(0xff4d7e,0xff4d7e,0.25), goldM=M(0xfebc2e,0xfebc2e,0.35), whiteM=M(0xf4f4ec,0xf4f4ec,0.05);
+    var charG=new THREE.Group(); scene.add(charG);
+    // floating glow base
+    var base=new THREE.Mesh(new THREE.TorusGeometry(0.95,0.09,10,32),cyanM); base.rotation.x=Math.PI/2; base.position.y=-1.72; charG.add(base);
+    var baseDisc=new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.95,0.16,24),darkM); baseDisc.position.y=-1.78; charG.add(baseDisc);
+    // legs
+    function leg(side){ var g=new THREE.Group(); g.position.set(side*0.34,-0.78,0); var l=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.72,0.38),darkM); l.position.y=-0.34; g.add(l); var shoe=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.2,0.62),pinkM); shoe.position.set(0,-0.74,0.1); g.add(shoe); charG.add(g); return g; }
+    var legL=leg(-1), legR=leg(1);
+    // body / hoodie
+    var body=new THREE.Mesh(new THREE.BoxGeometry(1.42,1.2,0.9),hoodie); body.position.y=-0.12; charG.add(body);
+    var pocket=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.4,0.06),hoodieD); pocket.position.set(0,-0.38,0.47); charG.add(pocket);
+    var zip=new THREE.Mesh(new THREE.BoxGeometry(0.07,1.1,0.05),darkM); zip.position.set(0,-0.1,0.47); charG.add(zip);
+    // head group
+    var headG=new THREE.Group(); headG.position.y=0.98; charG.add(headG);
+    var head=new THREE.Mesh(new THREE.SphereGeometry(0.74,SEG,SEG),skin); headG.add(head);
+    var eyeW=M(0xffffff,0xffffff,0.1);
+    function eye(side){ var g=new THREE.Group(); g.position.set(side*0.27,0.08,0.62); var w=new THREE.Mesh(new THREE.SphereGeometry(0.13,12,12),eyeW); g.add(w); var pup=new THREE.Mesh(new THREE.SphereGeometry(0.065,10,10),new THREE.MeshBasicMaterial({color:0x101018})); pup.position.z=0.08; g.add(pup); headG.add(g); return g; }
+    var eyeL=eye(-1), eyeR=eye(1);
+    [-1,1].forEach(function(sd){ var cheek=new THREE.Mesh(new THREE.SphereGeometry(0.11,10,10),pinkM); cheek.scale.set(1,0.6,0.35); cheek.position.set(sd*0.44,-0.16,0.6); headG.add(cheek); });
+    var smile=new THREE.Mesh(new THREE.TorusGeometry(0.2,0.035,8,20,Math.PI),new THREE.MeshBasicMaterial({color:0x40260f})); smile.position.set(0,-0.2,0.66); smile.rotation.z=Math.PI; headG.add(smile);
+    // backwards cap: dome + strap at front + brim sticking out the BACK-left so it reads on screen
+    var capG=new THREE.Group(); capG.position.y=0.3; capG.rotation.z=0.1; headG.add(capG);
+    var dome=new THREE.Mesh(new THREE.SphereGeometry(0.77,SEG,Math.max(SEG-6,10),0,Math.PI*2,0,Math.PI*0.52),capM); capG.add(dome);
+    var strap=new THREE.Mesh(new THREE.BoxGeometry(0.62,0.13,0.06),darkM); strap.position.set(0,0.1,0.72); capG.add(strap);
+    var brim=new THREE.Mesh(new THREE.BoxGeometry(0.66,0.07,0.55),capM); brim.position.set(-0.55,0.06,-0.62); brim.rotation.z=0.22; capG.add(brim);
+    var capBtn=new THREE.Mesh(new THREE.SphereGeometry(0.09,10,10),goldM); capBtn.position.y=0.76; capG.add(capBtn);
+    // headphones: band + ear cups + mic
+    var band=new THREE.Mesh(new THREE.TorusGeometry(0.8,0.085,10,28,Math.PI),darkM); band.position.y=0.12; headG.add(band);
+    function cup(side){ var g=new THREE.Group(); g.position.set(side*0.76,0,0); var c=new THREE.Mesh(new THREE.CylinderGeometry(0.27,0.27,0.2,18),darkM); c.rotation.z=Math.PI/2; g.add(c); var ring=new THREE.Mesh(new THREE.TorusGeometry(0.2,0.045,8,20),cyanM); ring.rotation.y=Math.PI/2; ring.position.x=side*0.11; g.add(ring); headG.add(g); return g; }
+    cup(-1); cup(1);
+    var mic=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,8),darkM); mic.position.set(0.62,-0.32,0.42); mic.rotation.z=0.9; mic.rotation.x=0.5; headG.add(mic);
+    var micTip=new THREE.Mesh(new THREE.SphereGeometry(0.06,10,10),pinkM); micTip.position.set(0.42,-0.44,0.55); headG.add(micTip);
+    // arms (shoulder pivots)
+    function arm(side){ var g=new THREE.Group(); g.position.set(side*0.82,0.32,0); var a=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.92,0.3),hoodieD); a.position.y=-0.42; g.add(a); var hand=new THREE.Mesh(new THREE.SphereGeometry(0.17,12,12),skin); hand.position.y=-0.9; g.add(hand); charG.add(g); g.userData.hand=hand; return g; }
+    var armL=arm(-1), armR=arm(1);
+    // props
+    function attach(parent,x,y,z){ var g=new THREE.Group(); g.position.set(x,y,z); parent.add(g); return g; }
+    var discProp=attach(armL,0,-1.05,0.18);
+    var dBody=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.1,24),darkM); dBody.rotation.x=Math.PI/2; discProp.add(dBody);
+    var dRimM=M(0xc6ff3a,0xc6ff3a,0.6); var dRim=new THREE.Mesh(new THREE.TorusGeometry(0.42,0.05,8,28),dRimM); discProp.add(dRim);
+    var dSh=new THREE.Shape(); dSh.moveTo(-0.13,-0.18); dSh.lineTo(-0.13,0.18); dSh.lineTo(0.22,0); dSh.closePath();
+    var dTri=new THREE.Mesh(new THREE.ExtrudeGeometry(dSh,{depth:0.07,bevelEnabled:false}),M(0xc6ff3a,0xc6ff3a,0.5)); dTri.position.z=0.05; discProp.add(dTri);
+    var clapProp=attach(armR,0,-1.05,0.15); var clapB=new THREE.Mesh(new THREE.BoxGeometry(0.62,0.46,0.07),darkM); clapProp.add(clapB); var clapT=new THREE.Mesh(new THREE.BoxGeometry(0.62,0.13,0.08),goldM); clapT.position.y=0.3; clapProp.add(clapT); clapProp.visible=false;
+    var coinProp=attach(armR,0,-1.08,0.15);
+    var coinC=document.createElement('canvas'); coinC.width=coinC.height=128; var cg=coinC.getContext('2d'); cg.fillStyle='#febc2e'; cg.beginPath(); cg.arc(64,64,60,0,6.29); cg.fill(); cg.strokeStyle='#a86e00'; cg.lineWidth=6; cg.stroke(); cg.fillStyle='#7a4d00'; cg.font='900 62px Arial'; cg.textAlign='center'; cg.textBaseline='middle'; cg.fillText('\u20B9',64,68);
+    var coinTex=new THREE.CanvasTexture(coinC);
+    var coin=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.34,0.09,24),new THREE.MeshStandardMaterial({map:coinTex,roughness:0.35,metalness:0.5,emissive:0x664400,emissiveIntensity:0.3})); coin.rotation.x=Math.PI/2; coinProp.add(coin); coinProp.visible=false;
+    var envProp=attach(armR,0,-1.05,0.15); var envB=new THREE.Mesh(new THREE.BoxGeometry(0.66,0.44,0.06),whiteM); envProp.add(envB); var envF=new THREE.Mesh(new THREE.BoxGeometry(0.66,0.24,0.07),cyanM); envF.position.y=0.12; envProp.add(envF); envProp.visible=false;
+    var orb1=new THREE.Mesh(new THREE.SphereGeometry(0.16,14,14),cyanM); scene.add(orb1);
+    var orb2=new THREE.Mesh(new THREE.SphereGeometry(0.16,14,14),pinkM); scene.add(orb2);
+    orb1.visible=orb2.visible=false;
+    // sections, anchors, poses
+    var SECTIONS=[['top','R','SAYS HELLO'],['about','L','THUMBS UP'],['services','R','JUGGLING SKILLS'],['work','L','PRESS PLAY'],['thumbnails','R','THUMBNAIL FAN'],['career','L','ON SET'],['stack','R','TOOL ORBIT FAN'],['pricing','L','FROM \u20B9200'],['contact','R','SAY HELLO ANYTIME']];
+    var POSES={
+      top:{aL:[-0.25,0,0.5],aR:[-2.5,0,-0.5],head:[0,0.15,0],props:['disc']},
+      about:{aL:[-0.2,0,0.35],aR:[-2.9,0,-0.2],head:[0.28,0,0],props:['disc']},
+      services:{aL:[-1.5,0,0.7],aR:[-1.5,0,-0.7],head:[0,0,0.06],props:['orbs']},
+      work:{aL:[-0.25,0,0.5],aR:[-1.45,0,-1.15],head:[0,-0.3,0],props:['disc']},
+      thumbnails:{aL:[-0.25,0,0.5],aR:[-2.2,0,-0.4],head:[0,0.1,0],props:['disc']},
+      career:{aL:[-0.3,0,0.45],aR:[-2.1,0,-0.35],head:[0,0.2,0],props:['clap']},
+      stack:{aL:[-2.0,0,0.55],aR:[-0.3,0,-0.4],head:[-0.2,-0.35,0],props:['disc']},
+      pricing:{aL:[-0.25,0,0.5],aR:[-2.6,0,-0.3],head:[0,0.1,0.08],props:['coin']},
+      contact:{aL:[-2.5,0,0.5],aR:[-2.0,0,-0.35],head:[0,0.15,0],props:['env']}
+    };
+    function sectionTops(){ return SECTIONS.map(function(sq){ var el=document.getElementById(sq[0]); return el?el.offsetTop:0; }); }
+    var tops=sectionTops(); setTimeout(function(){ tops=sectionTops(); },1200); addEventListener('resize',function(){ tops=sectionTops(); sizeChar(); });
+    function sizeChar(){ var w=wrap.clientWidth,h=wrap.clientHeight; r.setSize(w,h,false); cam.aspect=w/Math.max(h,1); cam.updateProjectionMatrix(); }
+    sizeChar();
+    var curPose='top', poseBlend={aL:[0,0,0],aR:[0,0,0],head:[0,0,0]};
+    var jumpAt=-9, celebAt=-9, orbitAt=-9, reactPoseUntil=-9, prevSc=window.scrollY||0, lean=0;
+    var posX=innerWidth-210, posY=innerHeight*0.5, firstPos=true, frameNo=0;
+    var posS=1, prefCand='base';
+    var mouseX=0, mouseY=0; addEventListener('pointermove',function(e){ mouseX=(e.clientX/innerWidth-0.5)*2; mouseY=(e.clientY/innerHeight-0.5)*2; },{passive:true});
+    var hidden=false; document.addEventListener('visibilitychange',function(){ hidden=document.hidden; });
+    function setProps(list){ discProp.visible=list.indexOf('disc')>=0; clapProp.visible=list.indexOf('clap')>=0; coinProp.visible=list.indexOf('coin')>=0; envProp.visible=list.indexOf('env')>=0; orb1.visible=orb2.visible=list.indexOf('orbs')>=0; }
+    /* EXCLUSION ZONES: pills, stage captions, CTA buttons, stat chips, nav — the
+       character's rendered box (head + name tag included) must never intersect these. */
+    var exclEls=[];
+    document.querySelectorAll('header .nav,.kicker,.glass-chip,.stage .hud,.hero-stats .stat,.scroll-hint,main .btn,.fbtn,.cf-btn,.cf-dots button,.play-overlay,#orbitChip,#workGrid .work-card,#thumbGrid .thumb-card,#thumbLightbox .lb-close,#reel .player').forEach(function(el){ exclEls.push(el); });
+    function exclRects(){ var out=[]; for(var i=0;i<exclEls.length;i++){ var rc=exclEls[i].getBoundingClientRect(); if(rc.width>0&&rc.height>0&&rc.bottom>-40&&rc.top<innerHeight+40) out.push(rc); } return out; }
+    var cl=new THREE.Clock();
+    (function anim(){
+      requestAnimationFrame(anim); if(hidden) return;
+      var t=cl.getElapsedTime();
+      var sc=window.scrollY||document.documentElement.scrollTop, vh=innerHeight, mid=sc+vh*0.45;
+      var idx=0; for(var i=0;i<tops.length;i++){ if(mid>=tops[i]-80) idx=i; }
+      // smooth travel between anchors of current and next section
+      var cur=SECTIONS[idx], nxt=SECTIONS[Math.min(idx+1,SECTIONS.length-1)];
+      var segStart=tops[idx]||0, segEnd=(tops[idx+1]!=null?tops[idx+1]:segStart+vh);
+      var f=segEnd>segStart?Math.min(Math.max((mid-segStart)/(segEnd-segStart),0),1):0; f=f*f*(3-2*f);
+      function ax(side){
+        var w=wrap.clientWidth;
+        /* Clear space only: wide viewports have real gutters beside the centred wrap;
+           narrower ones get an edge-peek so most of the character sits off-canvas. */
+        if(innerWidth>=1240) return side==='L'?6:innerWidth-w-6;
+        if(innerWidth<=760) return side==='L'?-w*0.30:innerWidth-w*0.70;
+        return side==='L'?-w*0.34:innerWidth-w*0.66;
+      }
+      var txp=ax(cur[1])+(ax(nxt[1])-ax(cur[1]))*f;
+      /* Hero anchor on small screens: peek further out to the edge, clear of the CTA buttons. */
+      if(innerWidth<=820&&cur[0]==='top') txp += (cur[1]==='R'?18:-18);
+      /* Bottom edge safe-zone as the default dock; the exclusion solver below then
+         moves the character off any pill / caption / button / chip it would touch. */
+      var typ=vh-wrap.clientHeight-14 + Math.sin(t*1.4)*3;
+      /* Mobile + text-dense sections: shrink to a small peek rather than covering copy. */
+      var denseSec=(cur[0]==='about'||cur[0]==='services'||cur[0]==='career'||cur[0]==='pricing'||cur[0]==='thumbnails');
+      var cScale=1;
+      if(innerWidth<=820&&cur[0]==='top') cScale=0.8; /* bigger everywhere, shrunk only at the hero anchor so buttons stay fully visible */
+      else if(innerWidth<=760&&denseSec) cScale=0.8;
+      /* ---- exclusion-zone solver: try docks in order, first fully-clear one wins.
+         Candidate box = rendered character box (origin 50% 100%) + 34px above for
+         the name tag / Zzz, tested against live rects padded by 10px. ---- */
+      var CW=wrap.clientWidth, CH=wrap.clientHeight, rects=exclRects();
+      /* The name tag is hidden at hero/stack anchors, so it must not count as
+         part of the box there — counting it pushed the character off-screen
+         on phones, where the tag's phantom height made every dock look blocked. */
+      var tagPad=(cur[0]==='top'||cur[0]==='stack'||cur[0]==='thumbnails')?0:34;
+      function boxFor(x,y,s){ var cx=x+CW/2; return {l:cx-CW*s/2, r:cx+CW*s/2, t:y+CH-CH*s-tagPad, b:y+CH}; }
+      function hitArea(b){ var a=0; for(var i=0;i<rects.length;i++){ var rc=rects[i]; var ox=Math.min(b.r,rc.right+10)-Math.max(b.l,rc.left-10); var oy=Math.min(b.b,rc.bottom+10)-Math.max(b.t,rc.top-10); if(ox>0&&oy>0) a+=ox*oy; } return a; }
+      function downY(x,y,s){ var b=boxFor(x,y,s), need=null; for(var i=0;i<rects.length;i++){ var rc=rects[i]; var ox=Math.min(b.r,rc.right+10)-Math.max(b.l,rc.left-10); var oy=Math.min(b.b,rc.bottom+10)-Math.max(b.t,rc.top-10); if(ox>0&&oy>0&&(need===null||rc.bottom>need)) need=rc.bottom; } return need===null?y:y+(need+14-b.t); }
+      function mirrorX(x){ return innerWidth-CW-x; }
+      var cands=[{k:'base',x:txp,y:typ,s:cScale},{k:'mirror',x:mirrorX(txp),y:typ,s:cScale}];
+      if(cur[0]==='top'){
+        /* Hero specials: desktop docks raised beside the stage (clear of its pill and
+           captions, which sit at the stage's corners); mobile docks top-right under
+           the fixed nav, right of the headline and above the CTA/stat stack. */
+        if(innerWidth>820){ var stEl=document.getElementById('stage'); if(stEl){ var sr=stEl.getBoundingClientRect(); if(sr.bottom>0&&sr.top<vh) cands.push({k:'special',x:ax(cur[1]),y:sr.top+84-CH*(1-cScale),s:cScale}); } }
+        else { var nvEl=document.querySelector('header .nav'); if(nvEl){ var nr=nvEl.getBoundingClientRect(); cands.unshift({k:'special',x:Math.min(txp,innerWidth-CW*0.45),y:nr.bottom+24-CH*(1-cScale),s:cScale}); } }
+      }
+      cands.push({k:'baseDown',x:txp,y:downY(txp,typ,cScale),s:cScale});
+      if(cur[0]==='thumbnails'&&innerWidth>820&&innerWidth<1600){
+        /* Thumbnails: the 3-across cards span the full wrap, so a normal bottom
+           dock lands on the right card's caption. Peek further out to the right
+           edge — only a sliver of the character box touches the card, clear of
+           the caption text — while wide viewports keep the normal gutter dock.
+           The downY() y-value is deliberate: like baseDown it measures clear
+           below the cards, and the safety clamp below docks it at the edge. */
+        cands.push({k:'thumbPeek',x:innerWidth-160,y:downY(innerWidth-160,typ,cScale),s:cScale});
+      }
+      cands.push({k:'mirrorDown',x:mirrorX(txp),y:downY(mirrorX(txp),typ,cScale),s:cScale});
+      cands.push({k:'shrink',x:txp,y:typ,s:cScale*0.72});
+      for(var oi=0;oi<cands.length;oi++){ if(cands[oi].k===prefCand){ cands.unshift(cands.splice(oi,1)[0]); break; } }
+      var chosen=null;
+      for(var ci=0;ci<cands.length;ci++){ if(hitArea(boxFor(cands[ci].x,cands[ci].y,cands[ci].s))<=0){ chosen=cands[ci]; break; } }
+      if(!chosen){ chosen=cands[0]; var bestA=hitArea(boxFor(chosen.x,chosen.y,chosen.s)); for(var cj=1;cj<cands.length;cj++){ var ca2=hitArea(boxFor(cands[cj].x,cands[cj].y,cands[cj].s)); if(ca2<bestA){ bestA=ca2; chosen=cands[cj]; } } }
+      /* On-screen safety net: a dock pushed below the fold (e.g. by downY on a
+         phone) made the character invisible. Never let it leave the viewport. */
+      chosen.y=Math.min(chosen.y, vh-CH*chosen.s-6);
+      chosen.y=Math.max(chosen.y, -CH*(1-chosen.s)-4);
+      chosen.x=Math.max(chosen.x, -CW*0.55);
+      chosen.x=Math.min(chosen.x, innerWidth-CW*0.45);
+      prefCand=chosen.k;
+      if(firstPos){ posX=chosen.x; posY=chosen.y; posS=chosen.s; firstPos=false; }
+      posX+=(chosen.x-posX)*0.055; posY+=(chosen.y-posY)*0.055; posS+=(chosen.s-posS)*0.08;
+      wrap.style.transform='translate('+posX.toFixed(1)+'px,'+posY.toFixed(1)+'px) scale('+posS.toFixed(3)+')';
+      /* Taps must never be swallowed: when the character's rendered box overlaps
+         any tile, button or pill, taps pass straight through to the page below
+         (JS re-enables its own tap bubble only when it sits fully clear). */
+      if(++frameNo%12===0){
+        var cb={l:posX+CW/2-CW*posS/2, r:posX+CW/2+CW*posS/2, t:posY+CH-CH*posS-34, b:posY+CH};
+        var blocked=false;
+        for(var bi=0;bi<rects.length;bi++){ var br=rects[bi]; if(cb.l<br.right+6&&cb.r>br.left-6&&cb.t<br.bottom+6&&cb.b>br.top-6){ blocked=true; break; } }
+        var pe=blocked?'none':'auto';
+        if(wrap.style.pointerEvents!==pe) wrap.style.pointerEvents=pe;
+      }
+      /* Name tag: hidden at hero/stack/thumbnails anchors where other pills/labels live (e.g. the
+         hero stage's LIQUID GLASS pill, thumbnail captions) so tags can never collide; shown elsewhere,
+         offset above the character's head instead of across its base. */
+      if(label){ label.style.opacity=(cur[0]==='top'||cur[0]==='stack'||cur[0]==='thumbnails')?'0':'1'; }
+      /* consume queued reactions */
+      if(jumpQueued){ jumpAt=t; jumpQueued=false; }
+      if(celebrateQueued){ celebAt=t; celebrateQueued=false; showBubble('Showreel time! Enjoy the edit',3000); }
+      if(formQueued){ reactPoseUntil=t+2.6; formQueued=false; }
+      if(orbitQueued){ orbitAt=t; orbitQueued=false; }
+      if(!sleeping && (Date.now()-lastActiveMs)>20000){ sleeping=true; if(zzz) zzz.classList.add('show'); }
+      if(bubble && bubble.classList.contains('show')){ var bcx=posX+wrap.clientWidth/2; bubble.classList.toggle('bub-r',bcx>innerWidth/2); bubble.classList.toggle('bub-l',bcx<=innerWidth/2); bubble.classList.toggle('bub-below',posY<200); }
+      var key=cur[0];
+      if(key!==curPose){ curPose=key; prefCand=(key==='thumbnails')?'thumbPeek':'base'; if(label) label.textContent='EDIT BUDDY \u00B7 '+cur[2]; setProps(POSES[key].props); }
+      var P=POSES[(t<reactPoseUntil)?'about':curPose];
+      ['aL','aR','head'].forEach(function(k){ for(var j=0;j<3;j++){ poseBlend[k][j]+=(P[k][j]-poseBlend[k][j])*0.06; } });
+      armL.rotation.set(poseBlend.aL[0],poseBlend.aL[1],poseBlend.aL[2]);
+      armR.rotation.set(poseBlend.aR[0],poseBlend.aR[1],poseBlend.aR[2]);
+      headG.rotation.set(poseBlend.head[0]+mouseY*0.16,poseBlend.head[1]+mouseX*0.38,poseBlend.head[2]);
+      // looping life + pose specials
+      var jumpY=0; if(t-jumpAt<0.75){ jumpY=Math.sin((t-jumpAt)/0.75*Math.PI)*0.6; }
+      var orbBounce=0; if(t-orbitAt<1.2){ orbBounce=Math.abs(Math.sin((t-orbitAt)*10))*0.13*(1-(t-orbitAt)/1.2); }
+      charG.position.y=Math.sin(t*(sleeping?0.9:1.9))*(sleeping?0.05:0.09)+jumpY+orbBounce; charG.scale.y=1+Math.sin(t*2.4)*0.012;
+      var spinA=0; if(t-celebAt<1.25){ spinA=(t-celebAt)/1.25*Math.PI*2; }
+      charG.rotation.y=(cur[1]==='L'?0.34:-0.34)+mouseX*0.12+spinA;
+      charG.rotation.x=mouseY*0.06;
+      var scNow=window.scrollY||document.documentElement.scrollTop; var sVel=scNow-prevSc; prevSc=scNow; lean+=((Math.max(-1,Math.min(1,sVel*0.02))*-0.16)-lean)*0.12; charG.rotation.z=lean;
+      legL.rotation.x=Math.sin(t*1.9)*0.1; legR.rotation.x=-Math.sin(t*1.9)*0.1;
+      base.rotation.z=t*0.8;
+      if(curPose==='top'||curPose==='contact'){ armR.rotation.z+=Math.sin(t*6)*0.38; }
+      if(t-jumpAt<0.75){ armR.rotation.z+=Math.sin(t*22)*0.42; }
+      if(curPose==='about'){ headG.rotation.x+=Math.abs(Math.sin(t*2.6))*0.16; }
+      if(curPose==='services'){ discProp.visible=false; var wp=new THREE.Vector3(); armL.getWorldPosition(wp);
+        orb1.position.set(charG.position.x-0.7,1.15+Math.abs(Math.sin(t*3.4))*0.55,charG.position.z+0.5);
+        orb2.position.set(charG.position.x+0.7,1.15+Math.abs(Math.cos(t*3.4))*0.55,charG.position.z+0.5);
+        // orbs live in scene space relative to camera view of the fixed character: convert by placing them as children offsets instead
+        orb1.position.set(-0.75,1.3+Math.abs(Math.sin(t*3.4))*0.5,0.6); orb2.position.set(0.75,1.3+Math.abs(Math.cos(t*3.4))*0.5,0.6);
+        if(orb1.parent!==charG){ charG.add(orb1); charG.add(orb2); }
+      }
+      if(curPose==='work'){ var ps=1+ (Math.sin(t*4)*0.5+0.5)*0.3; discProp.scale.set(ps,ps,ps); dRimM.emissiveIntensity=0.6+Math.sin(t*4)*0.4; } else { discProp.scale.set(1,1,1); }
+      if(curPose==='stack'){ discProp.rotation.z=t*2.2; dRimM.emissiveIntensity=1.1; } else if(curPose!=='work'){ discProp.rotation.z+=0.02; }
+      if(curPose==='pricing'){ coinProp.rotation.y=t*2.6; }
+      if(curPose==='career'){ clapT.rotation.x=0; clapProp.rotation.z=Math.sin(t*3)*0.12; }
+      var blink=sleeping?0.3:((Math.sin(t*0.85)>0.965)?0.12:1); eyeL.scale.y=blink; eyeR.scale.y=blink;
+      eyeL.children[1].position.x=mouseX*0.03; eyeR.children[1].position.x=mouseX*0.03;
+      eyeL.children[1].position.y=-mouseY*0.035; eyeR.children[1].position.y=-mouseY*0.035;
+      r.render(scene,cam);
+    })();
+    setProps(POSES.top.props);
+  })();
+
+  /* ---- 2) ABOUT FILM REEL ---- */
+  (function(){
+    var cv=document.getElementById('glReel'); if(!cv) return;
+    var r=mkRenderer(cv); if(!r) return; var vis=visTracker(cv.parentElement);
+    var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(44,2,0.1,100); cam.position.set(0,0.6,7.5);
+    lights(scene);
+    var reel=new THREE.Group(); reel.position.x=-1.6; scene.add(reel);
+    var disc=new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.55,0.28,40),stdMat(0x2a2a44)); disc.rotation.x=Math.PI/2; reel.add(disc);
+    var rim=new THREE.Mesh(new THREE.TorusGeometry(1.55,0.09,12,48),stdMat(LIME,LIME)); reel.add(rim);
+    var hub=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.34,0.42,20),stdMat(GOLD,GOLD)); hub.rotation.x=Math.PI/2; reel.add(hub);
+    for(var i=0;i<6;i++){ var a=i/6*Math.PI*2;
+      var hole=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.34,16),new THREE.MeshBasicMaterial({color:0x07070d})); hole.rotation.x=Math.PI/2; hole.position.set(Math.cos(a)*0.92,Math.sin(a)*0.92,0); reel.add(hole);
+      var spoke=new THREE.Mesh(new THREE.BoxGeometry(0.16,1.0,0.32),stdMat(CYAN,CYAN)); spoke.position.set(Math.cos(a+0.5)*0.6,Math.sin(a+0.5)*0.6,0); spoke.rotation.z=a+0.5-Math.PI/2; reel.add(spoke);
+    }
+    // unspooling film strip: small dark frames along a curve
+    var strip=new THREE.Group(); scene.add(strip);
+    for(var j=0;j<14;j++){ var tt=j/13; var fx=-0.2+tt*4.6, fy=-1.35+Math.sin(tt*4.2)*0.55 - tt*0.2;
+      var fr=new THREE.Mesh(new THREE.BoxGeometry(0.42,0.56,0.04),stdMat(0x141428)); fr.position.set(fx,fy, -0.2+Math.sin(tt*3)*0.2); fr.rotation.set(0.15,tt*0.7,Math.sin(tt*4.2)*0.3); strip.add(fr);
+      var eg=new THREE.LineSegments(new THREE.EdgesGeometry(fr.geometry),new THREE.LineBasicMaterial({color:j%2?CYAN:VIOLET})); eg.position.copy(fr.position); eg.rotation.copy(fr.rotation); strip.add(eg);
+    }
+    var mx=0,tx=0; cv.parentElement.addEventListener('mousemove',function(e){ var b=cv.getBoundingClientRect(); tx=((e.clientX-b.left)/b.width-0.5)*2; });
+    function rs(){ sizeTo(r,cam,cv.parentElement); } rs(); addEventListener('resize',rs);
+    var cl=new THREE.Clock();
+    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime(); mx+=(tx-mx)*0.05;
+      reel.rotation.z=-t*0.55; reel.rotation.y=mx*0.5; strip.position.y=Math.sin(t*1.2)*0.08; strip.rotation.y=mx*0.2;
+      r.render(scene,cam); })();
+  })();
+
+  /* ---- 3) SERVICES 3D CLUSTER ---- */
+  (function(){
+    if(SMALL) return;
+    var cv=document.getElementById('glSvc'); if(!cv) return;
+    var r=mkRenderer(cv); if(!r) return; var vis=visTracker(cv.parentElement);
+    var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(44,3,0.1,100); cam.position.set(0,0.4,8);
+    lights(scene);
+    var knot=new THREE.Mesh(new THREE.TorusKnotGeometry(0.85,0.28,90,12),stdMat(VIOLET,VIOLET)); knot.position.x=-3.4; scene.add(knot);
+    // clapperboard from boxes
+    var clap=new THREE.Group(); clap.position.set(0,0.1,0);
+    var board=new THREE.Mesh(new THREE.BoxGeometry(1.7,1.15,0.12),stdMat(0x222238)); clap.add(board);
+    var topBar=new THREE.Group(); topBar.position.y=0.68;
+    var tb=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.3,0.14),stdMat(LIME,LIME)); topBar.add(tb); clap.add(topBar);
+    var triS=new THREE.Shape(); triS.moveTo(-0.28,-0.36); triS.lineTo(-0.28,0.36); triS.lineTo(0.42,0); triS.closePath();
+    var tri=new THREE.Mesh(new THREE.ExtrudeGeometry(triS,{depth:0.08,bevelEnabled:false}),stdMat(PINK,PINK)); tri.position.set(0,-0.05,0.08); clap.add(tri);
+    scene.add(clap);
+    var octa=new THREE.Mesh(new THREE.OctahedronGeometry(0.75),stdMat(CYAN,CYAN)); octa.position.x=3.4; octa.position.y=0.4; scene.add(octa);
+    var tor=new THREE.Mesh(new THREE.TorusGeometry(0.62,0.2,12,32),stdMat(GOLD,GOLD)); tor.position.set(1.9,-0.9,-0.6); scene.add(tor);
+    var ico=new THREE.Mesh(new THREE.IcosahedronGeometry(0.55),stdMat(LIME,LIME)); ico.position.set(-2,-1,-0.4); scene.add(ico);
+    var speed=1,target=1;
+    cv.parentElement.addEventListener('mouseenter',function(){ target=3.2; knot.material.emissive.setHex(PINK); octa.material.emissive.setHex(LIME); });
+    cv.parentElement.addEventListener('mouseleave',function(){ target=1; knot.material.emissive.setHex(VIOLET); octa.material.emissive.setHex(CYAN); });
+    function rs(){ sizeTo(r,cam,cv.parentElement); } rs(); addEventListener('resize',rs);
+    var cl=new THREE.Clock();
+    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime(); speed+=(target-speed)*0.06;
+      knot.rotation.x=t*0.4*speed; knot.rotation.y=t*0.55*speed; knot.position.y=Math.sin(t*1.3)*0.18;
+      clap.rotation.y=Math.sin(t*0.7*speed)*0.45; topBar.rotation.z=-0.25-Math.abs(Math.sin(t*2.2*speed))*0.45; // clap snap loop
+      octa.rotation.x=t*0.6*speed; octa.rotation.y=t*0.8*speed; octa.position.y=0.4+Math.sin(t*1.6+1)*0.2;
+      tor.rotation.x=t*0.7*speed; ico.rotation.y=t*0.9*speed; ico.position.y=-1+Math.sin(t*1.9)*0.15;
+      r.render(scene,cam); })();
+  })();
+
+  /* ---- 4) TECH STACK 3D ORBIT — DOUBLE COUNTER-ROTATING RINGS ---- */
+  (function(){
+    var cv=document.getElementById('glOrbit'); if(!cv) return;
+    var r=mkRenderer(cv); if(!r) return; var vis=visTracker(cv.parentElement);
+    var chip=document.getElementById('orbitChip'), chipName=document.getElementById('orbitChipName'), chipDesc=document.getElementById('orbitChipDesc');
+    var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(46,3,0.1,100); cam.position.set(0,2.7,9.2); cam.lookAt(0,0,0);
+    lights(scene);
+    var TOOLS=[
+      {k:'Pr',name:'Premiere Pro',desc:'Primary editing tool \u00B7 95%',bg:'#3b1573',fg:'#d9b8ff',rim:0x8b5cf6},
+      {k:'Ae',name:'After Effects',desc:'Motion graphics & VFX \u00B7 90%',bg:'#2a2a72',fg:'#c9ccff',rim:0x8a9cff},
+      {k:'Cc',name:'CapCut',desc:'Fast reels & shorts \u00B7 92%',bg:'#f1f1f1',fg:'#111111',rim:0xffffff},
+      {k:'Am',name:'Alight Motion',desc:'Mobile motion design \u00B7 88%',bg:'#0d5c33',fg:'#a8ffc9',rim:0x00e676},
+      {k:'Cv',name:'Canva',desc:'Thumbnails & design \u00B7 90%',bg:'#0e5a73',fg:'#b3ecff',rim:0x00c4cc},
+      {k:'n8n',name:'n8n',desc:'AI automation & chatbots',bg:'#5c1a2e',fg:'#ffc2d1',rim:0xff4d7e}
+    ];
+    function labelTex(tool){
+      var c=document.createElement('canvas'); c.width=c.height=160; var g=c.getContext('2d');
+      var grd=g.createLinearGradient(0,0,160,160); grd.addColorStop(0,tool.bg); grd.addColorStop(1,'#10101c'); g.fillStyle=grd; g.beginPath(); g.arc(80,80,76,0,6.29); g.fill();
+      g.strokeStyle='rgba(255,255,255,0.9)'; g.lineWidth=5; g.stroke();
+      g.fillStyle=tool.fg; g.font='900 '+(tool.k.length>2?40:52)+'px Arial'; g.textAlign='center'; g.textBaseline='middle'; g.fillText(tool.k,80,84);
+      return new THREE.CanvasTexture(c);
+    }
+    // centre play disc + expanding glass pulse rings
+    var centre=new THREE.Group(); scene.add(centre);
+    var cd=new THREE.Mesh(new THREE.CylinderGeometry(1.02,1.02,0.3,36),stdMat(0x23233a)); cd.rotation.x=Math.PI/2; centre.add(cd);
+    var cr=new THREE.Mesh(new THREE.TorusGeometry(1.02,0.06,10,40),stdMat(LIME,LIME)); centre.add(cr);
+    var csh=new THREE.Shape(); csh.moveTo(-0.3,-0.4); csh.lineTo(-0.3,0.4); csh.lineTo(0.46,0); csh.closePath();
+    var ctri=new THREE.Mesh(new THREE.ExtrudeGeometry(csh,{depth:0.14,bevelEnabled:false}),stdMat(LIME,LIME)); ctri.position.z=0.16; centre.add(ctri);
+    var pulses=[];
+    for(var pi=0;pi<3;pi++){ var pm=new THREE.Mesh(new THREE.RingGeometry(1.08,1.2,48),new THREE.MeshBasicMaterial({color:0xc6ff3a,transparent:true,opacity:0.3,side:THREE.DoubleSide})); pm.position.z=0.05; centre.add(pm); pulses.push(pm); }
+    var ringOut=new THREE.Mesh(new THREE.TorusGeometry(3.35,0.022,8,90),new THREE.MeshBasicMaterial({color:0x4a4a68})); ringOut.rotation.x=Math.PI/2.15; scene.add(ringOut);
+    var ringIn=new THREE.Mesh(new THREE.TorusGeometry(2.0,0.02,8,70),new THREE.MeshBasicMaterial({color:0x3ae0ff})); ringIn.rotation.x=Math.PI/2.3; scene.add(ringIn);
+    // outer discs with trails
+    var discs=[], hitMeshes=[];
+    TOOLS.forEach(function(tool,i){
+      var grp=new THREE.Group(); scene.add(grp);
+      var inner=new THREE.Group(); grp.add(inner);
+      var bodyM=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.16,28),new THREE.MeshStandardMaterial({color:0x1c1c2e,roughness:0.35,metalness:0.4})); bodyM.rotation.x=Math.PI/2; inner.add(bodyM);
+      var faceM=new THREE.Mesh(new THREE.CircleGeometry(0.58,28),new THREE.MeshBasicMaterial({map:labelTex(tool)})); faceM.position.z=0.09; faceM.userData.toolIndex=i; inner.add(faceM); hitMeshes.push(faceM);
+      var rimM=new THREE.MeshStandardMaterial({color:tool.rim,emissive:tool.rim,emissiveIntensity:0.4,roughness:0.3,metalness:0.4});
+      var rim=new THREE.Mesh(new THREE.TorusGeometry(0.6,0.045,10,36),rimM); inner.add(rim);
+      var trails=[];
+      for(var ti=0;ti<2;ti++){ var tm=new THREE.Mesh(new THREE.CircleGeometry(0.52-ti*0.1,24),new THREE.MeshBasicMaterial({color:tool.rim,transparent:true,opacity:0})); scene.add(tm); trails.push(tm); }
+      discs.push({grp:grp,inner:inner,rimM:rimM,trails:trails,ph:i/TOOLS.length*Math.PI*2,spin:(i%2? -1:1)*(0.7+i*0.08)});
+    });
+    // inner counter-rotating glowing skill orbs (sprites always face camera)
+    var SKILLS=['4K','REELS','MOTION','SUBS','GRADE','AI'];
+    var SKCOL=['#c6ff3a','#ff4d7e','#8b5cf6','#3ae0ff','#febc2e','#00e676'];
+    var orbs=[];
+    SKILLS.forEach(function(sk,i){
+      var c=document.createElement('canvas'); c.width=c.height=128; var g=c.getContext('2d');
+      g.fillStyle=SKCOL[i]; g.beginPath(); g.arc(64,64,56,0,6.29); g.fill(); g.strokeStyle='rgba(255,255,255,.9)'; g.lineWidth=4; g.stroke();
+      g.fillStyle='#0b0b08'; g.font='900 26px Arial'; g.textAlign='center'; g.textBaseline='middle'; g.fillText(sk,64,66);
+      var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,opacity:0.95}));
+      sp.scale.set(0.62,0.62,1); scene.add(sp);
+      var glow=new THREE.Mesh(new THREE.SphereGeometry(0.13,12,12),new THREE.MeshBasicMaterial({color:new THREE.Color(SKCOL[i])})); scene.add(glow);
+      orbs.push({sp:sp,glow:glow,ph:i/SKILLS.length*Math.PI*2});
+    });
+    // interaction: hover / tap a disc
+    var selected=-1, orbitSpeed=1, ray=new THREE.Raycaster(), ptr=new THREE.Vector2();
+    function pick(e){
+      var b=cv.getBoundingClientRect(); ptr.x=((e.clientX-b.left)/b.width)*2-1; ptr.y=-((e.clientY-b.top)/b.height)*2+1;
+      ray.setFromCamera(ptr,cam); var hits=ray.intersectObjects(hitMeshes);
+      return hits.length?hits[0].object.userData.toolIndex:-1;
+    }
+    function select(i){
+      selected=i;
+      if(i>=0){ try{ document.dispatchEvent(new CustomEvent('orbitpick',{detail:i})); }catch(e){} }
+      if(i>=0 && chip){ chipName.textContent=TOOLS[i].name; chipDesc.textContent=TOOLS[i].desc; chip.classList.add('show'); }
+      else if(chip){ chip.classList.remove('show'); }
+    }
+    cv.addEventListener('pointermove',function(e){ if(e.pointerType!=='mouse') return; var i=pick(e); if(i!==selected) select(i); cv.style.cursor=i>=0?'pointer':'grab'; });
+    cv.addEventListener('pointerdown',function(e){ var i=pick(e); select(i===selected?-1:i); });
+    cv.parentElement.addEventListener('mouseleave',function(){ select(-1); });
+    function rs(){ sizeTo(r,cam,cv.parentElement); } rs(); addEventListener('resize',rs);
+    var cl=new THREE.Clock(), ang=0, angIn=0, last=0;
+    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime(); var dt=Math.min(t-last,0.05); last=t;
+      orbitSpeed+=(((selected>=0)?0:1)-orbitSpeed)*0.07;
+      ang+=dt*0.5*orbitSpeed; angIn-=dt*0.85*orbitSpeed;
+      centre.rotation.z=t*0.3; centre.position.y=Math.sin(t*1.4)*0.1;
+      pulses.forEach(function(pm,pi){ var ph=((t*0.45+pi/3)%1); pm.scale.setScalar(1+ph*1.5); pm.material.opacity=0.32*(1-ph); });
+      discs.forEach(function(d,i){
+        var a=ang+d.ph, isSel=(i===selected);
+        var x=Math.cos(a)*3.35, z=Math.sin(a)*1.3, y=Math.sin(t*1.25+i*1.3)*0.26;
+        var depth=(z/1.3+1)/2; // 0 back, 1 front
+        if(isSel){ d.grp.position.x+=(0-d.grp.position.x)*0.1; d.grp.position.y+=(0.15-d.grp.position.y)*0.1; d.grp.position.z+=(3.1-d.grp.position.z)*0.1; var ss=1.55; d.grp.scale.set(ss,ss,ss); }
+        else { d.grp.position.set(x,y,z); var sc=0.8+depth*0.5; d.grp.scale.set(sc,sc,sc); }
+        d.inner.rotation.z=t*d.spin; d.grp.rotation.x=Math.sin(t*1.1+i)*0.14; d.grp.rotation.y=Math.cos(t*0.9+i)*0.18;
+        d.rimM.emissiveIntensity=isSel?1.5:(0.3+depth*0.95);
+        d.grp.traverse(function(o){ if(o.material&&o.material.transparent!==true){} });
+        d.trails.forEach(function(tm,ti){
+          if(isSel||selected>=0){ tm.material.opacity=0; return; }
+          var ta=a-(ti+1)*0.22, tx2=Math.cos(ta)*3.35, tz2=Math.sin(ta)*1.3;
+          tm.position.set(tx2,Math.sin(t*1.25+i*1.3)*0.26,tz2-0.05); var ts=(0.8+depth*0.5)*(0.9-ti*0.18); tm.scale.set(ts,ts,ts);
+          tm.material.opacity=depth>0.62?(0.16-ti*0.06)*(depth-0.62)*2.2:0;
+        });
+      });
+      orbs.forEach(function(o,i){ var a=angIn+o.ph; o.sp.position.set(Math.cos(a)*2.0,Math.sin(t*1.6+i)*0.3,Math.sin(a)*0.85); o.glow.position.copy(o.sp.position); var gs=1+Math.sin(t*3+i)*0.25; o.glow.scale.set(gs,gs,gs); });
+      ringIn.rotation.z=-t*0.2; ringOut.rotation.z=t*0.12;
+      r.render(scene,cam); })();
+  })();
+
+  /* ---- 5) WORK floating shapes behind tiles ---- */
+  (function(){
+    if(SMALL) return;
+    var cv=document.getElementById('glWork'); if(!cv) return;
+    var r=mkRenderer(cv); if(!r) return; var vis=visTracker(cv);
+    var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(50,2,0.1,100); cam.position.z=9;
+    var shapes=[];
+    var geos=[new THREE.TorusGeometry(0.7,0.18,10,28), new THREE.OctahedronGeometry(0.7), new THREE.IcosahedronGeometry(0.6), new THREE.BoxGeometry(0.9,0.9,0.9), new THREE.TorusKnotGeometry(0.45,0.16,60,10)];
+    var cols=[LIME,VIOLET,CYAN,PINK,GOLD];
+    for(var i=0;i<7;i++){ var m=new THREE.Mesh(geos[i%geos.length],new THREE.MeshStandardMaterial({color:cols[i%cols.length],emissive:cols[i%cols.length],emissiveIntensity:0.25,roughness:0.4,metalness:0.4,transparent:true,opacity:0.75}));
+      m.position.set((Math.random()-0.5)*13,(Math.random()-0.5)*5,(Math.random()-0.5)*3-1); scene.add(m); shapes.push({m:m,ph:Math.random()*6.28,sp:0.3+Math.random()*0.5,y:m.position.y}); }
+    scene.add(new THREE.AmbientLight(0xffffff,0.7)); var dl=new THREE.DirectionalLight(0xffffff,0.9); dl.position.set(3,5,6); scene.add(dl);
+    var mx=0,tx=0; document.getElementById('work').addEventListener('mousemove',function(e){ tx=(e.clientX/innerWidth-0.5)*2; });
+    function rs(){ var p=cv.parentElement; r.setSize(p.clientWidth,p.clientHeight,false); cam.aspect=p.clientWidth/Math.max(p.clientHeight,1); cam.updateProjectionMatrix(); }
+    setTimeout(rs,300); addEventListener('resize',rs);
+    var cl=new THREE.Clock();
+    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime(); mx+=(tx-mx)*0.04;
+      shapes.forEach(function(s){ s.m.rotation.x=t*s.sp; s.m.rotation.y=t*s.sp*1.3; s.m.position.y=s.y+Math.sin(t*0.9+s.ph)*0.35; s.m.position.x+=Math.sin(t*0.2+s.ph)*0.001; });
+      cam.position.x=mx*1.1; cam.lookAt(0,0,0); // parallax
+      r.render(scene,cam); })();
+  })();
+
+  /* ---- 6) CONTACT particle wave + rotating play disc ---- */
+  (function(){
+    var cv=document.getElementById('glContact'); if(!cv) return;
+    var r=mkRenderer(cv); if(!r) return; var vis=visTracker(cv.parentElement);
+    var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(46,3,0.1,100); cam.position.set(0,1.6,7.5); cam.lookAt(0,0,0);
+    lights(scene);
+    var NX=SMALL?36:56, NZ=18, geo=new THREE.BufferGeometry(), pos=new Float32Array(NX*NZ*3), idx=0;
+    for(var ix=0;ix<NX;ix++) for(var iz=0;iz<NZ;iz++){ pos[idx++]=(ix-NX/2)*0.32; pos[idx++]=0; pos[idx++]=(iz-NZ/2)*0.32; }
+    geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    var wave=new THREE.Points(geo,new THREE.PointsMaterial({color:CYAN,size:0.09,transparent:true,opacity:0.9}));
+    wave.position.set(-2.2,-0.7,0); scene.add(wave);
+    var discG=new THREE.Group(); discG.position.set(3.1,0.3,0); scene.add(discG);
+    var d=new THREE.Mesh(new THREE.CylinderGeometry(0.95,0.95,0.24,32),stdMat(0x23233a)); d.rotation.x=Math.PI/2; discG.add(d);
+    var rr=new THREE.Mesh(new THREE.TorusGeometry(0.95,0.055,10,40),stdMat(PINK,PINK)); discG.add(rr);
+    var sh=new THREE.Shape(); sh.moveTo(-0.28,-0.38); sh.lineTo(-0.28,0.38); sh.lineTo(0.44,0); sh.closePath();
+    var tri=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.12,bevelEnabled:false}),stdMat(LIME,LIME)); tri.position.z=0.13; discG.add(tri);
+    // envelope from boxes
+    var env=new THREE.Group(); env.position.set(4.6,-1,0.4);
+    var eb=new THREE.Mesh(new THREE.BoxGeometry(1.05,0.7,0.08),stdMat(GOLD,GOLD)); env.add(eb);
+    var flap=new THREE.Mesh(new THREE.BoxGeometry(1.05,0.36,0.06),stdMat(LIME,LIME)); flap.position.set(0,0.28,-0.02); flap.rotation.x=-0.7; env.add(flap);
+    scene.add(env);
+    function rs(){ sizeTo(r,cam,cv.parentElement); } rs(); addEventListener('resize',rs);
+    var cl=new THREE.Clock();
+    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime();
+      var arr=geo.attributes.position.array, k=0;
+      for(var ix=0;ix<NX;ix++) for(var iz=0;iz<NZ;iz++){ var x=arr[k], z=arr[k+2]; arr[k+1]=Math.sin(x*1.1+t*2)*0.22+Math.cos(z*1.4+t*1.6)*0.18; k+=3; }
+      geo.attributes.position.needsUpdate=true;
+      discG.rotation.y=t*0.7; discG.position.y=0.3+Math.sin(t*1.5)*0.14;
+      env.rotation.y=Math.sin(t*0.9)*0.5; env.position.y=-1+Math.sin(t*1.8)*0.12; flap.rotation.x=-0.7-Math.abs(Math.sin(t*1.4))*0.5;
+      r.render(scene,cam); })();
+  })();
+})();
+</script>
+</body>
+</html>
