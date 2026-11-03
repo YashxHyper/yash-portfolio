@@ -413,7 +413,8 @@ footer a:hover{text-decoration:underline}
 .about-3d{height:250px;margin-top:18px}
 .svc-3d{height:230px;margin-bottom:22px}
 .stack-3d{height:320px;margin-bottom:22px}
-.contact-3d{height:190px;margin-bottom:20px}
+.contact-3d{height:230px;margin-bottom:20px}
+#glContact{cursor:pointer;touch-action:pan-y}
 /* If a phone/webview loses a WebGL context (or cannot create one under
    memory pressure), a mini 3D box must never sit empty: hide the dead
    canvas and show a spinning play disc in its place. HUD labels stay. */
@@ -422,7 +423,7 @@ footer a:hover{text-decoration:underline}
 .work-3d-wrap{position:relative}
 #glWork{position:absolute;inset:-30px -10px; width:calc(100% + 20px);height:calc(100% + 60px);z-index:0;pointer-events:none;opacity:.55}
 .work-3d-wrap .grid{position:relative;z-index:1}
-@media(max-width:760px){.svc-3d{height:180px}.stack-3d{height:240px}.about-3d{height:200px}}
+@media(max-width:760px){.svc-3d{height:180px}.stack-3d{height:240px}.about-3d{height:200px}.contact-3d{height:205px}}
 
 /* ===== APPLE-STYLE LIQUID GLASS LAYER (original CSS, no Apple assets) ===== */
 :root{--glass-brd:rgba(255,255,255,.28);--glass-fill:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 42%,rgba(198,255,58,.07) 78%,rgba(139,92,246,.10));--glass-shadow:0 18px 40px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(255,255,255,.08),inset 1px 0 0 rgba(255,255,255,.14)}
@@ -725,11 +726,11 @@ section[id]{scroll-margin-top:92px}
 
       <div class="stage" id="stage">
         <div class="css-fallback" aria-hidden="true"><div class="disc"></div></div>
-        <canvas id="gl" aria-label="Interactive 3D scene of a video editor world — glowing play button, gyroscope rings, floating HYPER letter cubes, film frames and timeline orbiting in space. Tap the stage for a HYPER burst."></canvas>
+        <canvas id="gl" aria-label="Interactive 3D scene of a video editor world — glowing play button, gyroscope rings, floating editing-software logo cubes for Premiere Pro, After Effects, CapCut, Alight Motion, Canva and n8n, film frames and timeline orbiting in space. Tap the stage for a HYPER burst."></canvas>
         <div class="glass-ring" aria-hidden="true"></div><div class="glass-blob gb1" aria-hidden="true"></div><div class="glass-blob gb2" aria-hidden="true"></div><span class="glass-chip" aria-hidden="true">LIQUID GLASS · LIVE 3D</span>
         <span class="hud tl"><span class="rec"></span>REC · 3D_SCENE_01</span>
         <span class="hud tr">LIVE RENDER</span>
-        <span class="hud bl">Click stage — HYPER BURST</span>
+        <span class="hud bl">Click stage — HYPER BURST · Pr · Ae · Cc · Am · Cv · n8n</span>
         <span class="hud br">Three.js · 60 FPS</span>
       </div>
     </div>
@@ -781,7 +782,7 @@ section[id]{scroll-margin-top:92px}
       <h2>Everything your <span class="grad">Content Needs</span></h2>
       <p>For YouTubers, Instagram Creators, Startups &amp; Fitness Influencers. All videos delivered in <strong style="color:var(--lime)">4K Ultra HD Quality</strong>.</p>
     </div>
-    <div class="mini3d svc-3d reveal"><canvas id="glSvc" aria-label="Live 3D shapes for services — hover to speed up"></canvas><span class="hud tl">SERVICE_SHAPES_3D</span><span class="hud tr">HOVER = TURBO</span></div>
+    <div class="mini3d svc-3d reveal"><canvas id="glSvc" aria-label="Live 3D editing-software logo tiles for Premiere Pro, After Effects, CapCut, Alight Motion, Canva and n8n — hover or tap to speed them up"></canvas><span class="hud tl">EDITING_TOOLS_3D</span><span class="hud tr">HOVER / TAP = TURBO</span></div>
     <div class="grid" id="serviceGrid"></div>
   </div>
 </section>
@@ -1143,7 +1144,7 @@ section[id]{scroll-margin-top:92px}
       <h2>Let's Make Something <span class="grad">HYPER</span></h2>
       <p>Tell me about your project — I usually reply fast, and your first sample edit can be in 4K.</p>
     </div>
-    <div class="mini3d contact-3d reveal"><canvas id="glContact" aria-label="Live 3D particle wave with rotating play disc"></canvas><span class="hud tl">WAVE_3D</span><span class="hud tr">LIVE RENDER</span></div>
+    <div class="mini3d contact-3d reveal"><canvas id="glContact" aria-label="Interactive live 3D particle wave — move your pointer over it to stir ripples, tap it for a ripple burst with a spinning play disc and opening envelope"></canvas><span class="hud tl">WAVE_3D · INTERACTIVE</span><span class="hud tr">MOVE / TAP = RIPPLE</span></div>
     <div class="contact-grid">
       <div class="reveal">
         <a class="c-link" href="mailto:yash36796@gmail.com"><span class="cic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><span><small>Email</small><b>yash36796@gmail.com</b></span></a>
@@ -1625,13 +1626,16 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
     new THREE.MeshStandardMaterial({color: CYAN, emissive: CYAN, emissiveIntensity: 0.45, roughness: 0.4}));
   ringB.rotation.x = Math.PI/1.7; ringB.rotation.y = 0.5; world.add(ringB);
 
-  /* ---- TAGDA ADDITION: gyroscope cage + floating HYPER letter cubes ----
+  /* ---- TAGDA ADDITION: gyroscope cage + floating editing-software logo cubes ----
      All inside this one hero renderer (no new WebGL context, so phones
      pay almost nothing extra): three counter-rotating emissive rings cage
-     the play disc, five glowing letter cubes orbit it in an ellipse, and
-     a tap/click on the stage fires a HYPER BURST — shockwave rings, a
-     light flash and a camera punch-in. Loops forever, like everything
-     else on this page. */
+     the play disc, six glowing logo cubes for the editing tools Yash
+     actually uses orbit it in an ellipse, and a tap/click on the stage
+     fires a HYPER BURST — shockwave rings, a light flash and a camera
+     punch-in. Loops forever, like everything else on this page. The
+     logos are drawn as text badges (initials + tool name) on canvas
+     textures, in each tool's own colours — the same badge style the
+     Tech Stack orbit already uses. */
   var gyroSeg = mobile ? 48 : 80;
   var gyro = new THREE.Group(); world.add(gyro);
   var gyroRings = [];
@@ -1650,25 +1654,30 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
   );
   gyroCore.position.set(0, 0, 2.9); gyro.add(gyroCore);
 
-  function letterTex(letter, hexCss){
-    var c = document.createElement('canvas'); c.width = c.height = 128;
+  function logoTex(k, name, bg, hexCss){
+    var c = document.createElement('canvas'); c.width = c.height = 160;
     var g = c.getContext('2d');
-    g.fillStyle = '#10101c'; g.fillRect(0, 0, 128, 128);
-    g.strokeStyle = hexCss; g.lineWidth = 8; g.strokeRect(7, 7, 114, 114);
-    g.fillStyle = hexCss; g.font = '900 74px Arial, sans-serif';
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.shadowColor = hexCss; g.shadowBlur = 18; g.fillText(letter, 64, 68);
+    var grd = g.createLinearGradient(0, 0, 160, 160);
+    grd.addColorStop(0, bg); grd.addColorStop(1, '#10101c');
+    g.fillStyle = grd; g.fillRect(0, 0, 160, 160);
+    g.strokeStyle = hexCss; g.lineWidth = 7; g.strokeRect(6, 6, 148, 148);
+    g.fillStyle = hexCss; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.shadowColor = hexCss; g.shadowBlur = 16;
+    g.font = '900 ' + (k.length > 2 ? 46 : 62) + 'px Arial, sans-serif';
+    g.fillText(k, 80, 66);
+    g.shadowBlur = 0; g.font = '700 17px Arial, sans-serif';
+    g.fillText(name.toUpperCase(), 80, 126);
     return new THREE.CanvasTexture(c);
   }
-  var hyperCubes = [];
-  [['H', LIME, '#c6ff3a'], ['Y', VIOLET, '#8b5cf6'], ['P', CYAN, '#3ae0ff'], ['E', 0xff4d7e, '#ff4d7e'], ['R', 0xfebc2e, '#febc2e']].forEach(function(cfg, i){
-    var tex = letterTex(cfg[0], cfg[2]);
+  var toolCubes = [];
+  [['Pr', 'Premiere', LIME, '#c6ff3a', '#3b1573'], ['Ae', 'After FX', VIOLET, '#c9ccff', '#2a1a5e'], ['Cc', 'CapCut', CYAN, '#ffffff', '#111111'], ['Am', 'Alight', 0x00e676, '#a8ffc9', '#0d5c33'], ['Cv', 'Canva', CYAN, '#b3ecff', '#0e5a73'], ['n8n', 'n8n · AI', 0xff4d7e, '#ffc2d1', '#5c1a2e']].forEach(function(cfg, i){
+    var tex = logoTex(cfg[0], cfg[1], cfg[4], cfg[3]);
     var cube = new THREE.Mesh(
-      new THREE.BoxGeometry(0.74, 0.74, 0.74),
-      new THREE.MeshStandardMaterial({map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.45, roughness: 0.35, metalness: 0.3})
+      new THREE.BoxGeometry(0.82, 0.82, 0.82),
+      new THREE.MeshStandardMaterial({map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.5, roughness: 0.35, metalness: 0.3})
     );
     world.add(cube);
-    hyperCubes.push({m: cube, ph: i / 5 * Math.PI * 2, spin: 0.6 + i * 0.12, col: cfg[1]});
+    toolCubes.push({m: cube, ph: i / 6 * Math.PI * 2, spin: 0.55 + i * 0.11, col: cfg[2]});
   });
 
   /* shockwave rings for the burst (hidden until fired) */
@@ -1805,8 +1814,8 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
     gyro.rotation.z = Math.sin(t * 0.3) * 0.08;
     gyroCore.rotation.x = t * 1.4; gyroCore.rotation.y = t * 1.1;
     gyroCore.position.set(Math.cos(t * 0.9) * 2.9, Math.sin(t * 0.9) * 2.1, 2.9 - Math.abs(Math.sin(t * 0.9)) * 1.4);
-    /* HYPER letter cubes: elliptical orbit around the disc, spinning */
-    hyperCubes.forEach(function(hc){
+    /* Editing-software logo cubes: elliptical orbit around the disc, spinning */
+    toolCubes.forEach(function(hc){
       var a = t * 0.42 + hc.ph;
       var rx = 3.95 + burst * 1.15, ry = 2.55 + burst * 0.7;
       var depth = (Math.sin(a) + 1) / 2;
@@ -2206,39 +2215,63 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
       r.render(scene,cam); })();
   })();
 
-  /* ---- 3) SERVICES 3D CLUSTER ---- */
-  /* Runs on phones too (cheap: 5 meshes): previously phones got an empty
-     box here because this scene was skipped below 640px. */
+  /* ---- 3) SERVICES 3D CLUSTER — EDITING-SOFTWARE LOGO TILES ---- */
+  /* Runs on phones too (cheap: 6 flat tiles): previously phones got an
+     empty box here because this scene was skipped below 640px. The
+     generic shapes are gone — each tile is a spinning logo badge for
+     one of Yash's editing tools, drawn the same way as the Tech Stack
+     orbit discs (initials + tool name on a canvas texture). */
   (function(){
     var cv=document.getElementById('glSvc'); if(!cv) return;
     var r=mkRenderer(cv); if(!r) return; var vis=visTracker(cv.parentElement);
     var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(44,3,0.1,100); cam.position.set(0,0.4,8);
     lights(scene);
-    var knot=new THREE.Mesh(new THREE.TorusKnotGeometry(0.85,0.28,90,12),stdMat(VIOLET,VIOLET)); knot.position.x=-3.4; scene.add(knot);
-    // clapperboard from boxes
-    var clap=new THREE.Group(); clap.position.set(0,0.1,0);
-    var board=new THREE.Mesh(new THREE.BoxGeometry(1.7,1.15,0.12),stdMat(0x222238)); clap.add(board);
-    var topBar=new THREE.Group(); topBar.position.y=0.68;
-    var tb=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.3,0.14),stdMat(LIME,LIME)); topBar.add(tb); clap.add(topBar);
-    var triS=new THREE.Shape(); triS.moveTo(-0.28,-0.36); triS.lineTo(-0.28,0.36); triS.lineTo(0.42,0); triS.closePath();
-    var tri=new THREE.Mesh(new THREE.ExtrudeGeometry(triS,{depth:0.08,bevelEnabled:false}),stdMat(PINK,PINK)); tri.position.set(0,-0.05,0.08); clap.add(tri);
-    scene.add(clap);
-    var octa=new THREE.Mesh(new THREE.OctahedronGeometry(0.75),stdMat(CYAN,CYAN)); octa.position.x=3.4; octa.position.y=0.4; scene.add(octa);
-    var tor=new THREE.Mesh(new THREE.TorusGeometry(0.62,0.2,12,32),stdMat(GOLD,GOLD)); tor.position.set(1.9,-0.9,-0.6); scene.add(tor);
-    var ico=new THREE.Mesh(new THREE.IcosahedronGeometry(0.55),stdMat(LIME,LIME)); ico.position.set(-2,-1,-0.4); scene.add(ico);
-    var speed=1,target=1;
-    cv.parentElement.addEventListener('mouseenter',function(){ target=3.2; knot.material.emissive.setHex(PINK); octa.material.emissive.setHex(LIME); });
-    cv.parentElement.addEventListener('mouseleave',function(){ target=1; knot.material.emissive.setHex(VIOLET); octa.material.emissive.setHex(CYAN); });
+    function svcTex(k,name,bg,fg){
+      var c=document.createElement('canvas'); c.width=c.height=160; var g=c.getContext('2d');
+      var grd=g.createLinearGradient(0,0,160,160); grd.addColorStop(0,bg); grd.addColorStop(1,'#10101c');
+      g.fillStyle=grd; g.fillRect(0,0,160,160);
+      g.strokeStyle=fg; g.lineWidth=7; g.strokeRect(6,6,148,148);
+      g.fillStyle=fg; g.textAlign='center'; g.textBaseline='middle'; g.shadowColor=fg; g.shadowBlur=16;
+      g.font='900 '+(k.length>2?46:62)+'px Arial'; g.fillText(k,80,66);
+      g.shadowBlur=0; g.font='700 17px Arial'; g.fillText(name.toUpperCase(),80,126);
+      return new THREE.CanvasTexture(c);
+    }
+    var SVC_TOOLS=[
+      {k:'Pr',name:'Premiere',bg:'#3b1573',fg:'#d9b8ff'},
+      {k:'Ae',name:'After FX',bg:'#2a1a5e',fg:'#c9ccff'},
+      {k:'Cc',name:'CapCut',bg:'#111111',fg:'#ffffff'},
+      {k:'Am',name:'Alight',bg:'#0d5c33',fg:'#a8ffc9'},
+      {k:'Cv',name:'Canva',bg:'#0e5a73',fg:'#b3ecff'},
+      {k:'n8n',name:'n8n · AI',bg:'#5c1a2e',fg:'#ffc2d1'}
+    ];
+    var tiles=[], spreadX=3.55;
+    SVC_TOOLS.forEach(function(tool,i){
+      var tex=svcTex(tool.k,tool.name,tool.bg,tool.fg);
+      var m=new THREE.Mesh(new THREE.BoxGeometry(1.32,1.32,0.22),
+        new THREE.MeshStandardMaterial({map:tex,emissive:0xffffff,emissiveMap:tex,emissiveIntensity:0.5,roughness:0.35,metalness:0.3}));
+      m.position.set(0,(i%2?-0.45:0.45),0);
+      scene.add(m);
+      tiles.push({m:m,idx:i,baseY:(i%2?-0.45:0.45),dir:(i%2?-1:1),ph:i*1.1});
+    });
+    var speed=1,target=1,flash=0,flashTarget=0;
+    function turbo(on){ target=on?3.2:1; flashTarget=on?1:0; }
+    cv.parentElement.addEventListener('mouseenter',function(){ turbo(true); });
+    cv.parentElement.addEventListener('mouseleave',function(){ turbo(false); });
     /* Phones have no hover: a tap on the box gets the same turbo burst. */
-    cv.parentElement.addEventListener('touchstart',function(){ target=3.2; knot.material.emissive.setHex(PINK); octa.material.emissive.setHex(LIME); },{passive:true});
-    cv.parentElement.addEventListener('touchend',function(){ target=1; knot.material.emissive.setHex(VIOLET); octa.material.emissive.setHex(CYAN); },{passive:true});
-    function rs(){ sizeTo(r,cam,cv.parentElement); } rs(); addEventListener('resize',rs);
+    cv.parentElement.addEventListener('touchstart',function(){ turbo(true); },{passive:true});
+    cv.parentElement.addEventListener('touchend',function(){ turbo(false); },{passive:true});
+    function rs(){ sizeTo(r,cam,cv.parentElement); spreadX=Math.min(7.6,cam.aspect*1.35); } rs(); addEventListener('resize',rs);
     var cl=new THREE.Clock();
-    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime(); speed+=(target-speed)*0.06;
-      knot.rotation.x=t*0.4*speed; knot.rotation.y=t*0.55*speed; knot.position.y=Math.sin(t*1.3)*0.18;
-      clap.rotation.y=Math.sin(t*0.7*speed)*0.45; topBar.rotation.z=-0.25-Math.abs(Math.sin(t*2.2*speed))*0.45; // clap snap loop
-      octa.rotation.x=t*0.6*speed; octa.rotation.y=t*0.8*speed; octa.position.y=0.4+Math.sin(t*1.6+1)*0.2;
-      tor.rotation.x=t*0.7*speed; ico.rotation.y=t*0.9*speed; ico.position.y=-1+Math.sin(t*1.9)*0.15;
+    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime(); speed+=(target-speed)*0.06; flash+=(flashTarget-flash)*0.08;
+      tiles.forEach(function(tl,i){
+        tl.m.position.x=(tl.idx-2.5)/2.5*spreadX;
+        tl.m.rotation.y=t*0.55*speed*tl.dir+Math.sin(t*0.6+tl.ph)*0.25;
+        tl.m.rotation.x=Math.sin(t*0.8+tl.ph)*0.18;
+        tl.m.position.y=tl.baseY+Math.sin(t*1.4+tl.ph)*0.18;
+        tl.m.position.z=Math.sin(t*0.9+tl.ph)*0.25;
+        var s=1+flash*0.08+Math.sin(t*2+tl.ph)*0.02; tl.m.scale.set(s,s,s);
+        tl.m.material.emissiveIntensity=0.5+flash*0.65;
+      });
       r.render(scene,cam); })();
   })();
 
@@ -2375,10 +2408,12 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
     var r=mkRenderer(cv); if(!r) return; var vis=visTracker(cv.parentElement);
     var scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(46,3,0.1,100); cam.position.set(0,1.6,7.5); cam.lookAt(0,0,0);
     lights(scene);
-    var NX=SMALL?28:56, NZ=18, geo=new THREE.BufferGeometry(), pos=new Float32Array(NX*NZ*3), idx=0;
+    var NX=SMALL?28:56, NZ=18, geo=new THREE.BufferGeometry(), pos=new Float32Array(NX*NZ*3), col=new Float32Array(NX*NZ*3), idx=0;
     for(var ix=0;ix<NX;ix++) for(var iz=0;iz<NZ;iz++){ pos[idx++]=(ix-NX/2)*0.32; pos[idx++]=0; pos[idx++]=(iz-NZ/2)*0.32; }
+    for(var ci=0;ci<NX*NZ;ci++){ col[ci*3]=0.23; col[ci*3+1]=0.88; col[ci*3+2]=1; }
     geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-    var wave=new THREE.Points(geo,new THREE.PointsMaterial({color:CYAN,size:0.09,transparent:true,opacity:0.9}));
+    geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+    var wave=new THREE.Points(geo,new THREE.PointsMaterial({size:0.1,vertexColors:true,transparent:true,opacity:0.92}));
     wave.position.set(-2.2,-0.7,0); scene.add(wave);
     var discG=new THREE.Group(); discG.position.set(3.1,0.3,0); scene.add(discG);
     var d=new THREE.Mesh(new THREE.CylinderGeometry(0.95,0.95,0.24,32),stdMat(0x23233a)); d.rotation.x=Math.PI/2; discG.add(d);
@@ -2390,18 +2425,119 @@ document.getElementById('hireForm').addEventListener('submit', function(e){
     var eb=new THREE.Mesh(new THREE.BoxGeometry(1.05,0.7,0.08),stdMat(GOLD,GOLD)); env.add(eb);
     var flap=new THREE.Mesh(new THREE.BoxGeometry(1.05,0.36,0.06),stdMat(LIME,LIME)); flap.position.set(0,0.28,-0.02); flap.rotation.x=-0.7; env.add(flap);
     scene.add(env);
+    /* ---- TAGDA INTERACTION: stir the wave, fire ripple bursts ----
+       Pointer over the box stirs a ripple that follows it (mouse) and
+       leaves a fading trail while dragging; a tap/click fires a ripple
+       burst from that exact spot — shockwave rings, a light flash, the
+       play disc spins up and pops, the envelope jumps open, and the
+       wave itself flashes lime/pink at the peaks. No preventDefault
+       anywhere, so touch scrolling is never blocked. An automatic
+       ripple keeps it alive with no input at all. */
+    var box=cv.parentElement, hudTr=box.querySelector('.hud.tr'), hudTimer=null;
+    var ripples=[], hoverX=0, hoverZ=0, hoverOn=false, hoverAmt=0, dragging=false, lastTrailT=-1;
+    var burst=0, spinBoost=0, envJump=0, discAngle=0, camX=0, camY=0, nextAuto=2.2, prevT=0;
+    function addRipple(x,z,s){ ripples.push({x:x,z:z,t0:ripT,s:s}); if(ripples.length>4) ripples.shift(); }
+    /* Ripple age is measured on the animation clock (ripT, seconds since
+       this scene started), updated every frame in the loop below. */
+    var ripT=0; function rippleAge(rp){ return ripT-rp.t0; }
+    var wRay=new THREE.Raycaster(), wPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0), wHit=new THREE.Vector3(), wPtr=new THREE.Vector2();
+    function toWave(e){
+      var b=cv.getBoundingClientRect();
+      wPtr.x=((e.clientX-b.left)/b.width)*2-1; wPtr.y=-((e.clientY-b.top)/b.height)*2+1;
+      wRay.setFromCamera(wPtr,cam);
+      if(!wRay.ray.intersectPlane(wPlane,wHit)) return null;
+      return {x:wHit.x-wave.position.x, z:wHit.z-wave.position.z, nx:wPtr.x, ny:wPtr.y};
+    }
+    function fireRipple(p,strong){
+      var lx=p?p.x:0, lz=p?p.z:0;
+      addRipple(lx,lz,strong?1.5:0.9);
+      burst=1; spinBoost=1; envJump=1;
+      ringG.position.set(lx+wave.position.x,0.15,lz);
+      burstLight.position.set(lx+wave.position.x,1.1,lz+1.2);
+      if(hudTr){ hudTr.textContent='\u26A1 RIPPLE BURST'; if(hudTimer) clearTimeout(hudTimer); hudTimer=setTimeout(function(){ hudTr.textContent='MOVE / TAP = RIPPLE'; },1300); }
+    }
+    box.addEventListener('pointermove',function(e){
+      if(e.pointerType==='touch') return;
+      var p=toWave(e); if(!p) return;
+      hoverX=p.x; hoverZ=p.z; hoverOn=true; camX=p.nx; camY=p.ny;
+      if(ripT-lastTrailT>(dragging?0.05:0.14)){ addRipple(p.x,p.z,dragging?0.8:0.45); lastTrailT=ripT; }
+    });
+    box.addEventListener('pointerleave',function(){ hoverOn=false; dragging=false; camX=0; camY=0; });
+    cv.addEventListener('pointerdown',function(e){ dragging=true; var p=toWave(e); fireRipple(p,true); });
+    addEventListener('pointerup',function(){ dragging=false; });
+    /* shockwave rings + burst light, fired from the tap point */
+    var ringG=new THREE.Group(); scene.add(ringG);
+    var ringCols=[LIME,VIOLET];
+    var shockRings=[];
+    for(var ri=0;ri<2;ri++){
+      var rm=new THREE.Mesh(new THREE.RingGeometry(0.42,0.58,48),
+        new THREE.MeshBasicMaterial({color:ringCols[ri],transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));
+      rm.rotation.x=-Math.PI/2; rm.visible=false; ringG.add(rm); shockRings.push(rm);
+    }
+    var burstLight=new THREE.PointLight(0xc6ff3a,0,22); burstLight.position.set(0,1.1,1.2); scene.add(burstLight);
+    /* three spark orbs riding above the wave — they fly outward on a burst */
+    var sparks=[];
+    [LIME,PINK,VIOLET].forEach(function(c,si){
+      var sm=new THREE.Mesh(new THREE.SphereGeometry(0.13,12,12),new THREE.MeshBasicMaterial({color:c}));
+      scene.add(sm); sparks.push({m:sm,ph:si/3*Math.PI*2});
+    });
     function rs(){ sizeTo(r,cam,cv.parentElement); } rs(); addEventListener('resize',rs);
     var cl=new THREE.Clock(), waveTick=0;
-    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime();
+    (function anim(){ requestAnimationFrame(anim); if(!vis.visible) return; var t=cl.getElapsedTime(); ripT=t;
+      var dt=Math.min(Math.max(t-prevT,0),0.05); prevT=t;
+      burst=Math.max(0,burst-dt*0.75); spinBoost=Math.max(0,spinBoost-dt*0.85); envJump=Math.max(0,envJump-dt*1.1);
+      hoverAmt+=((hoverOn?1:0)-hoverAmt)*0.07;
+      for(var pi=ripples.length-1;pi>=0;pi--){ if(rippleAge(ripples[pi])>2.4) ripples.splice(pi,1); }
+      if(t>nextAuto){ addRipple((Math.random()-0.5)*14,(Math.random()-0.5)*4.5,0.85); nextAuto=t+2.4+Math.random()*1.4; }
       /* Phones: rewriting ~500 wave points every frame is pure CPU cost;
          every other frame still looks fluid at this size. */
       if(!SMALL || ((waveTick++)%2===0)){
-      var arr=geo.attributes.position.array, k=0;
-      for(var ix=0;ix<NX;ix++) for(var iz=0;iz<NZ;iz++){ var x=arr[k], z=arr[k+2]; arr[k+1]=Math.sin(x*1.1+t*2)*0.22+Math.cos(z*1.4+t*1.6)*0.18; k+=3; }
-      geo.attributes.position.needsUpdate=true;
+      var arr=geo.attributes.position.array, carr=geo.attributes.color.array, k=0;
+      for(var ix=0;ix<NX;ix++) for(var iz=0;iz<NZ;iz++){
+        var x=arr[k], z=arr[k+2];
+        var h=Math.sin(x*1.1+t*2)*0.22+Math.cos(z*1.4+t*1.6)*0.18;
+        for(var rp=0;rp<ripples.length;rp++){
+          var rpp=ripples[rp], age=rippleAge(rpp), rad=age*3.4;
+          var dx=x-rpp.x, dz=z-rpp.z, dist=Math.sqrt(dx*dx+dz*dz), dr=dist-rad;
+          h+=Math.exp(-(dr*dr)/0.6)*Math.exp(-age*1.05)*rpp.s
+            +Math.exp(-(dist*dist)/1.4)*Math.exp(-age*2.2)*rpp.s*0.7;
+        }
+        if(hoverAmt>0.02){ var hx=x-hoverX, hz=z-hoverZ; h+=Math.exp(-(hx*hx+hz*hz)/1.9)*0.55*hoverAmt; }
+        arr[k+1]=h;
+        /* peaks flash lime, then pink — the wave shows where it was touched */
+        var heat=Math.max(0,Math.min(1,(h+0.45)/1.3)), cr,cg,cb;
+        if(heat<=0.5){ var f=heat*2; cr=0.23+0.55*f; cg=0.88+0.12*f; cb=1-0.77*f; }
+        else { var f2=(heat-0.5)*2; cr=0.78+0.22*f2; cg=1-0.7*f2; cb=0.23+0.26*f2; }
+        carr[k]=cr; carr[k+1]=cg; carr[k+2]=cb;
+        k+=3;
       }
-      discG.rotation.y=t*0.7; discG.position.y=0.3+Math.sin(t*1.5)*0.14;
-      env.rotation.y=Math.sin(t*0.9)*0.5; env.position.y=-1+Math.sin(t*1.8)*0.12; flap.rotation.x=-0.7-Math.abs(Math.sin(t*1.4))*0.5;
+      geo.attributes.position.needsUpdate=true; geo.attributes.color.needsUpdate=true;
+      wave.material.size=0.1+burst*0.045;
+      }
+      discAngle+=dt*(0.7+spinBoost*6.5);
+      discG.rotation.y=discAngle;
+      discG.rotation.x+=(camY*0.18-discG.rotation.x)*0.06;
+      discG.rotation.z+=(-camX*0.18-discG.rotation.z)*0.06;
+      discG.position.y=0.3+Math.sin(t*1.5)*0.14+burst*0.35;
+      var ds=1+burst*0.18+spinBoost*0.04; discG.scale.set(ds,ds,ds);
+      tri.material.emissiveIntensity=0.35+burst*0.9+spinBoost*0.3;
+      env.rotation.y=Math.sin(t*0.9)*0.5+envJump*0.4; env.rotation.z=envJump*0.18;
+      env.position.y=-1+Math.sin(t*1.8)*0.12+envJump*0.5;
+      flap.rotation.x=Math.max(-2.05,-0.7-Math.abs(Math.sin(t*1.4))*0.5-burst*1.15);
+      sparks.forEach(function(sp,si){
+        var a=t*0.7+sp.ph, rad=2.3+burst*1.3;
+        sp.m.position.set(-2.2+Math.cos(a)*rad,0.55+Math.sin(t*1.8+sp.ph)*0.25+burst*0.55,Math.sin(a)*1.1);
+        var ss=1+burst*0.7+Math.sin(t*3+sp.ph)*0.15; sp.m.scale.set(ss,ss,ss);
+      });
+      shockRings.forEach(function(shr,ki){
+        if(burst<=0){ shr.visible=false; return; }
+        var ph=Math.min(1,(1-burst)*1.5+ki*0.25);
+        shr.visible=ph<1; shr.scale.setScalar(1+ph*5); shr.material.opacity=(1-ph)*0.6;
+      });
+      burstLight.intensity=burst*70;
+      cam.position.x+=(camX*0.55-cam.position.x)*0.05;
+      cam.position.y+=((1.6-camY*0.35)-cam.position.y)*0.05;
+      cam.lookAt(0,-0.1,0);
       r.render(scene,cam); })();
   })();
 })();
